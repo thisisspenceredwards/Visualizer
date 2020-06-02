@@ -99,10 +99,6 @@ class Board extends React.Component {
             endMarkerIndex: endStateMarker,
             squares: arr
         })
-        console.log("this is i: ", i)
-        console.log()
-        console.log("startMarkerIndex: " + startStateMarker)
-        console.log("endMarkerIndex: " + endStateMarker)
     }
     render() {
         let parent = []
@@ -140,7 +136,6 @@ class Game extends React.Component {
         );
     }
 }
-// ========================================
 
 ReactDOM.render(
 
