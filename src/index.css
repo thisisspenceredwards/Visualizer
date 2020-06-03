@@ -1,10 +1,12 @@
 body {
-  font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 20px;
+  font: 14vh "Century Gothic", Futura, sans-serif;
+  width: 100%;
+  height: 100%;
+
 }
 
 ol, ul {
-  padding-left: 30px;
+  padding-left: 30vh;
 }
 #startMarker
 {
@@ -29,22 +31,23 @@ ol, ul {
 }
 
 .status {
-  margin-bottom: 10px;
+  margin-bottom: 10vh;
 }
 
 .square {
   background-color: #fff;
-  border: 1px solid #999;
+  border: 1vh solid #999;
   float: left;
-  font-size: 24px;
+  /*font-size: 24vh;
   font-weight: bold;
-  line-height: 34px;
-  height: 68px;
-  margin-right: -1px;
-  margin-top: -1px;
-  padding: 0;
+  line-height: 34vh;
   text-align: center;
-  width: 68px;
+  */
+  height: 7vh;
+  margin-right: -1vh;
+  margin-top: -1vh;
+  padding: 0;
+  width: 7vh;
 }
 
 .square:focus {
@@ -56,20 +59,21 @@ ol, ul {
 }
 
 .game {
-  padding: 10px;
+  justify-content: center;
+  padding: 1vh;
   display: flex;
-  flex-direction: row;
 }
 
+
 .game-info {
-  margin-left: 20px;
+  margin-left: 2vh;
 }
 .btn.btn-primary {
-  margin: 10px;
+  margin: 1vh;
 }
 .btn.btn-primary-selected {
   font-weight: bold;
   background-color: red;
-  margin: 10px;
+  margin: 1vh;
 }
 
