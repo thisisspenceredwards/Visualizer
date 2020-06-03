@@ -9,7 +9,7 @@ class Square extends React.Component{
     {
         super(props)
         this.state = {
-            id: 'blueBackground',
+            id: '',
             hover: false
         }
         this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
@@ -27,7 +27,7 @@ class Square extends React.Component{
             hover: false})
     }
     render() {
-        let idState = ''
+        let idState
         if(this.state.hover)
             idState = this.state.id
         else
@@ -55,7 +55,7 @@ class Board extends React.Component {
         this.setMarker = this.setMarker.bind(this)
     }
     renderSquare(count) {
-        let state = ''
+        let state = 'slateGrey'
         if(count === this.state.startMarkerIndex)
         {
             state = 'startMarker'
