@@ -9,7 +9,7 @@ class Square extends React.Component{
     {
         super(props)
         this.state = {
-            id: '',
+            id: 'blueBackground',
             hover: false
         }
         this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
@@ -17,13 +17,13 @@ class Square extends React.Component{
     }
     onMouseEnterSquare() {
         this.setState({
-            id: 'isBackgroundRed',
+            id: 'redBackground',
             hover: true
         })
     }
     onMouseLeaveSquare() {
         this.setState({
-            id: '',
+            id: 'blueBackground',
             hover: false})
     }
     render() {

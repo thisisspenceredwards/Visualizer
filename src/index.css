@@ -14,7 +14,11 @@ ol, ul {
 {
   background-color: purple;
 }
-#isBackgroundRed
+#blueBackground
+{
+  background-color: blue;
+}
+#redBackground
 {
   background-color: red;
 }
@@ -29,7 +33,7 @@ ol, ul {
 }
 
 .square {
-  background: #fff;
+  background-color: #fff;
   border: 1px solid #999;
   float: left;
   font-size: 24px;
