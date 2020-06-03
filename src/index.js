@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.css'
 import DepthFirstSearch from './DepthFirstSearch.js'
+
 class Square extends React.Component{
     constructor(props)
     {
@@ -34,6 +35,7 @@ class Square extends React.Component{
             idState = this.props.id
         return (
             <Button
+                variant = "secondary"
                 className="square"
                 id = {idState}
                 onMouseEnter = {this.onMouseEnterSquare.bind()}
@@ -53,7 +55,8 @@ class Board extends React.Component {
             exitFinished: true,
             startMarkerIndex : -1,
             endMarkerIndex: -1,
-            index : 0
+            index : 0,
+            clicked : false
         }
         this.setMarker = this.setMarker.bind(this)
         this.animateAdjacentNodes = this.animateAdjacentNodes.bind(this)
@@ -118,14 +121,19 @@ class Board extends React.Component {
     }
     animateAdjacentNodes(SIZE, WIDTH, HEIGHT)
     {
-        this.timerID = setInterval(
-            () => this.tick(),
-            75
-        )
-        const k = new DepthFirstSearch()
-        let dictionary = k.createContainer(SIZE, WIDTH, HEIGHT)
-        this.setState({dictionary: dictionary})
-        console.log(dictionary)
+        if(this.state.clicked === false) {
+            this.setState({
+                clicked: true
+            })
+            this.timerID = setInterval(
+                () => this.tick(),
+                75
+            )
+            const k = new DepthFirstSearch()
+            let dictionary = k.createContainer(SIZE, WIDTH, HEIGHT)
+            this.setState({dictionary: dictionary})
+            console.log(dictionary)
+        }
     }
     tick(){
         let dictionary = this.state.dictionary
@@ -146,7 +154,8 @@ class Board extends React.Component {
         {
             this.setState({
                 index: 0,
-                iter: squares
+                iter: squares,
+                clicked: false
             })
             clearInterval(this.timerID)
         }
@@ -154,8 +163,8 @@ class Board extends React.Component {
     render() {
         let parent = []
         let count = 0
-        const HEIGHT = 10
-        const WIDTH = 10
+        const HEIGHT = this.props.height
+        const WIDTH = this.props.width
         const SIZE = HEIGHT * WIDTH
         for(let i =0; i < HEIGHT; i++)
         {
@@ -177,13 +186,19 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
-
-
+    constructor(props)
+    {
+        super(props)
+        this.state =({
+            height : 10,
+            width : 10,
+        })
+    }
     render() {
         return (
             <div id ="body" className="game">
                 <div className="game-board">
-                    <Board/>
+                    <Board height = {this.state.height} width = {this.state.width}/>
                 </div>
                 <div className="game-info">
                 </div>
@@ -193,7 +208,6 @@ class Game extends React.Component {
 }
 
 ReactDOM.render(
-
     <Game />,
     document.getElementById('root')
 );
