@@ -118,20 +118,14 @@ class Board extends React.Component {
     }
     animateAdjacentNodes(SIZE, WIDTH, HEIGHT)
     {
+        this.timerID = setInterval(
+            () => this.tick(),
+            75
+        )
         const k = new DepthFirstSearch()
         let dictionary = k.createContainer(SIZE, WIDTH, HEIGHT)
         this.setState({dictionary: dictionary})
         console.log(dictionary)
-    }
-    componentDidMount()
-    {
-        this.timerID = setInterval(
-            () => this.tick(),
-        1000
-        )
-    }
-    componentWillUnmount() {
-        clearInterval(this.timerID)
     }
     tick(){
         let dictionary = this.state.dictionary
@@ -139,7 +133,7 @@ class Board extends React.Component {
         let index = this.state.index
         if(dictionary !== undefined && index < Object.keys(dictionary).length){
             for (let i = 0; i < dictionary[index].length; i++) {
-                console.log(dictionary[index][i])
+                console.log(index)
                 squares[dictionary[index][i]] = 'A'
                 squares[index] = 'B'
             }
@@ -156,13 +150,12 @@ class Board extends React.Component {
             })
             clearInterval(this.timerID)
         }
-
     }
     render() {
         let parent = []
         let count = 0
-        const HEIGHT = 4
-        const WIDTH = 4
+        const HEIGHT = 10
+        const WIDTH = 10
         const SIZE = HEIGHT * WIDTH
         for(let i =0; i < HEIGHT; i++)
         {
