@@ -1,53 +1,47 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.css'
-import DepthFirstSearch from './DepthFirstSearch.js'
+import Board from './Board.js'
+import {ToastProvider} from "react-toast-notifications";
 
-class Square extends React.Component{
+class Game extends React.Component {
     constructor(props)
     {
         super(props)
-        this.state = {
-            id: '',
-            hover: false
-        }
-        this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
-        this.onMouseLeaveSquare = this.onMouseLeaveSquare.bind(this)
-    }
-    onMouseEnterSquare() {
-        this.setState({
-            id: 'redBackground',
-            hover: true
+        this.state =({
+            height : 5,
+            width : 5,
         })
     }
-    onMouseLeaveSquare() {
-        this.setState({
-            id: 'blueBackground',
-            hover: false})
-    }
     render() {
-        let idState
-        if(this.state.hover)
-            idState = this.state.id
-        else
-            idState = this.props.id
         return (
-            <Button
-                variant = "secondary"
-                className="square"
-                id = {idState}
-                onMouseEnter = {this.onMouseEnterSquare.bind()}
-                onMouseLeave = {this.onMouseLeaveSquare.bind()}
-                onClick = {this.props.onClick}>
-            </Button>)
+            <ToastProvider autoDismissTimeout={2000} placement="bottom-center">
+            <div id ="body" className="game">
+                <div className="game-board">
+                    <Board height = {this.state.height} width = {this.state.width}/>
+                </div>
+                <div className="game-info">
+                </div>
+            </div>
+            </ToastProvider>
+        );
     }
 }
 
+ReactDOM.render(
+    <Game />,
+
+
+    document.getElementById('root')
+);
+
+
+/*
 class Board extends React.Component {
     constructor(props) {
         super(props)
+
         this.state = {
             squares: Array(100).fill(undefined),
             iterSquares: Array(100).fill(undefined),
@@ -60,6 +54,17 @@ class Board extends React.Component {
         }
         this.setMarker = this.setMarker.bind(this)
         this.animateAdjacentNodes = this.animateAdjacentNodes.bind(this)
+        this.depthFirstSearch = this.depthFirstSearch.bind(this)
+    }
+    depthFirstSearch(SIZE, HEIGHT, WIDTH){
+        const k = new DepthFirstSearch()
+        let dictionary = k.createContainer(SIZE, WIDTH, HEIGHT)
+        this.setState({dictionary: dictionary})
+        console.log(dictionary)
+
+        let shortestPath = k.DFS(this.state.startMarkerIndex, this.state.endMarkerIndex, dictionary, SIZE)
+        console.log(shortestPath)
+
     }
     renderSquare(count) {
         let state = 'slateGrey'
@@ -94,6 +99,7 @@ class Board extends React.Component {
         {
             startStateMarker = -1
             arr[i] = undefined
+
         }
         else if(startStateMarker < 0 && endStateMarker === i) {
             endStateMarker = -1
@@ -180,34 +186,10 @@ class Board extends React.Component {
             <div>
                 {parent}
                 <Button onClick = {this.animateAdjacentNodes.bind(this, SIZE, WIDTH, HEIGHT)} > click me!</Button>
+                <Button onClick = {this.depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >DFS</Button>
+                <Button onClick = {ToastDemo}> hi </Button>
             </div>
         );
     }
 }
-
-class Game extends React.Component {
-    constructor(props)
-    {
-        super(props)
-        this.state =({
-            height : 10,
-            width : 10,
-        })
-    }
-    render() {
-        return (
-            <div id ="body" className="game">
-                <div className="game-board">
-                    <Board height = {this.state.height} width = {this.state.width}/>
-                </div>
-                <div className="game-info">
-                </div>
-            </div>
-        );
-    }
-}
-
-ReactDOM.render(
-    <Game />,
-    document.getElementById('root')
-);
+*/

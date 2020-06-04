@@ -16,7 +16,7 @@
 }
 #slateGrey
 {
-  /*background-color: slategrey;*/
+  background-color: slategrey;
 }
 #blueBackground
 {
@@ -40,16 +40,18 @@
   flex: auto;
   flex-direction: row;
 }
-
-
 .game-info {
   margin-left: 2vh;
 }
-.square:focus{
+.btn {
+  margin: 0.1vh;
+}
+
+/*.square:focus{
   outline: none;
   box-shadow: none;
 }
 .square:active:focus{
   outline: none;
   box-shadow: none;
-}
+}*/

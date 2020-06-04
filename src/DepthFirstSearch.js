@@ -1,15 +1,39 @@
-//number of vertices
-//in grid  x - x - x
-//         |   |   |
-//         x - x - x
-//         |   |   |
-//         x - x - x
-// # of (rows * (colums - 1)) + (rows-1 * columns)
-
 //first create graph
+
 
 export default class DepthFirstSearch
 {
+    constructor()
+    {
+        this.DFSUtil = this.DFSUtil.bind(this)
+        this.DFS = this.DFS.bind(this)
+    }
+    DFSUtil(visited, start, end, dictionary, count)
+    {
+        let c = 0;
+        if(start === end)
+        {
+            console.log("END this is start and adjacent node and count:" + start + " " + count)
+            return count
+        }
+        visited[start] = true
+        for(let i = 0; i < dictionary[start].length; i++)
+        {
+            if(visited[dictionary[start][i]] === false)
+            {
+
+                c = this.DFSUtil(visited, dictionary[start][i], end, dictionary, count + 1)
+            }
+        }
+        return c
+    }
+    DFS(start, end, dictionary, SIZE){ //start at, well start and look for end point
+        let visited = Array(SIZE).fill(false)
+        return this.DFSUtil(visited, start, end, dictionary, 0)
+    }
+
+
+
     createContainer(size, width)
     {//diagonals are also valid
         let dict = {}
@@ -59,6 +83,8 @@ export default class DepthFirstSearch
         }
         return dict
     }
+
+
 
 }
 
