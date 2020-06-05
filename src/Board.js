@@ -4,25 +4,74 @@ import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
 const Board = (props) => {
-    const [squares, setSquares] = useState([])
-    const [iterSquares, setIterSquares] = useState([])
+    const [squares, setSquares] = useState(Array(props.height * props.width).fill(null))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
     const [clicked, setClicked] = useState(false)
-    const [toast, setToast] = useState("")
     const { addToast } = useToasts()
-
+    let animate = (arr) =>
+    {
+        console.log("ANIMATE CALLED")
+        let tickIndex = 0
+        let timerID2
+        if(clicked === true)
+        {
+            return
+        }
+        const clearTickInterval = () => {
+            clearInterval(timerID2)
+        }
+        const tick2 = (tickArr) => {
+            console.log(tickArr)
+            let tickSquares = squares.slice()
+            //console.log(tickIndex)
+            if(tickIndex < tickArr.length){
+                for(let i = 0; i <= tickIndex; i++)
+                {
+                    console.log(tickArr[i])
+                    tickSquares[tickArr[i]] = 'D'
+                }
+                tickIndex++
+                setSquares(tickSquares)
+            }
+            else
+            {
+                //tickSquares[tickArr[tickArr.length]] = 'D'
+                console.log("END")
+                setSquares(tickSquares)
+                //setIterSquares(squares)
+                setClicked(false)
+                clearTickInterval()
+            }
+        }
+        timerID2 = setInterval (
+            () => tick2(arr),
+            250
+        )
+    }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) =>
     {
+        setClicked(true)
         const k = new DepthFirstSearch()
-        let dict = k.createContainer(SIZE, WIDTH, HEIGHT)
+        let dict = k.createContainer(SIZE, WIDTH)
         let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        console.log(shortestPath)
+        animate(shortestPath)
+        //console.log(shortestPath)
     }
     let renderSquare = (count) => {
+        //console.log("renderSquare")
         let state = 'slateGrey'
-        let squares = iterSquares
-        if(count === startMarkerIndex)
+
+        //console.log(squares[count] + " index: " + count)
+        if(squares[count] === 'D')
+        {
+            state = 'green'
+        }
+        else if(squares[count] === 'Z')
+        {
+            state = 'maroon'
+        }
+        else if(count === startMarkerIndex)
         {
             state = 'startMarker'
         }
@@ -37,6 +86,7 @@ const Board = (props) => {
             }
             else if(squares[count] === 'B')
             {
+                console.log("MARROOOON")
                 state = 'maroon'
             }
         }
@@ -74,6 +124,10 @@ const Board = (props) => {
             arr[i] = 'X'
             toastMessage = "Selected End Location"
         }
+        else
+        {
+            return
+        }
         setStartMarkerIndex(startStateMarker)
         setEndMarkerIndex(endStateMarker)
         setSquares(squares)
@@ -84,6 +138,8 @@ const Board = (props) => {
             autoDismiss: true,
         }))
     }
+
+
     const animateAdjacentNodes = (SIZE, WIDTH, HEIGHT) => {
         let tickIndex = 0
         let timerID
@@ -102,11 +158,11 @@ const Board = (props) => {
                 }
                 tickSquares[tickIndex] = 'B'
                 tickIndex++
-                setIterSquares(tickSquares)
+                setSquares(tickSquares)
             }
             else if(tickIndex === Object.keys(tickDictionary).length)
             {
-                setIterSquares(tickSquares)
+                setSquares(tickSquares)
                 setClicked(false)
                 clearTickInterval()
             }
