@@ -4,49 +4,40 @@ import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
 const Board = (props) => {
-    const [squares, setSquares] = useState(Array(props.height * props.width).fill(null))
+    let [squares, setSquares] = useState(Array(props.height * props.width).fill(null))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
     const [clicked, setClicked] = useState(false)
     const { addToast } = useToasts()
     let animate = (arr) =>
     {
-        console.log("ANIMATE CALLED")
-        let tickIndex = 0
+        let tickIndex = 1
         let timerID2
         if(clicked === true)
         {
             return
         }
         const clearTickInterval = () => {
+            console.log("clear)")
             clearInterval(timerID2)
         }
         const tick2 = (tickArr) => {
-            console.log(tickArr)
-            let tickSquares = squares.slice()
-            //console.log(tickIndex)
-            if(tickIndex < tickArr.length){
-                for(let i = 0; i <= tickIndex; i++)
-                {
-                    console.log(tickArr[i])
-                    tickSquares[tickArr[i]] = 'D'
-                }
+            if(tickIndex < tickArr.length-1){
+                //mutating the array directly :/
+                squares[tickArr[tickIndex]] = 'D'
                 tickIndex++
-                setSquares(tickSquares)
+                setSquares(squares.slice())
             }
-            else
-            {
-                //tickSquares[tickArr[tickArr.length]] = 'D'
-                console.log("END")
-                setSquares(tickSquares)
-                //setIterSquares(squares)
+            else {
+                squares[tickArr[tickArr.length-1]] = 'G'
+                setSquares(squares.slice())
+                clearTickInterval(timerID2)
                 setClicked(false)
-                clearTickInterval()
             }
         }
         timerID2 = setInterval (
             () => tick2(arr),
-            250
+            0
         )
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) =>
@@ -56,14 +47,14 @@ const Board = (props) => {
         let dict = k.createContainer(SIZE, WIDTH)
         let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
         animate(shortestPath)
-        //console.log(shortestPath)
     }
     let renderSquare = (count) => {
-        //console.log("renderSquare")
         let state = 'slateGrey'
-
-        //console.log(squares[count] + " index: " + count)
-        if(squares[count] === 'D')
+        if(squares[count] === 'G')
+        {
+            state = 'gold'
+        }
+        else if(squares[count] === 'D')
         {
             state = 'green'
         }
@@ -86,13 +77,13 @@ const Board = (props) => {
             }
             else if(squares[count] === 'B')
             {
-                console.log("MARROOOON")
                 state = 'maroon'
             }
         }
         return (<Square id = {state} onClick = {SetMarker.bind(this, count)} key = {count}/>)
     }
     let SetMarker = (i) => {
+        console.log("Set Marker")
         let toastMessage = ""
         let arr = squares.slice()
         let startStateMarker = startMarkerIndex;
@@ -131,7 +122,6 @@ const Board = (props) => {
         setStartMarkerIndex(startStateMarker)
         setEndMarkerIndex(endStateMarker)
         setSquares(squares)
-
         return (
                 addToast(toastMessage, {
             appearance: 'success',
@@ -179,6 +169,14 @@ const Board = (props) => {
             75
         )
     }
+    const clearGraph = () =>
+    {
+        //exit = true
+        setSquares(Array(props.height * props.width).fill(null))
+        setStartMarkerIndex(-1)
+        setEndMarkerIndex(-1)
+
+    }
     let parent = []
     let count = 0
     const HEIGHT = props.height
@@ -194,22 +192,14 @@ const Board = (props) => {
         }
         parent.push(<div key = {i}  className={"board-row"}>{children}</div>)
     }
-
     return (
-
         <div>
             {parent}
-
             <Button onClick = {animateAdjacentNodes.bind(this, SIZE, WIDTH, HEIGHT)} > click me!</Button>
             <Button onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >DFS</Button>
-
-
-
+            <Button onClick = {clearGraph.bind(this)}>Clear Graph</Button>
         </div>
-
-
     );
 }
-
 
 export default Board

@@ -1,33 +1,63 @@
 import React, {useState} from "react";
 import Button from "react-bootstrap/Button";
 
-const Square = (props) => {
-    const [id, setId] = useState("")
-    const [hover, setHover] = useState(false)
 
-    const onMouseEnterSquare= () => {
-        setId('redBackground')
-        setHover(true)
+
+
+class Square extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            hover: false,
+            id: ''
+        }
+        this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
+        this.onMouseLeaveSquare = this.onMouseLeaveSquare.bind(this)
+        this.onClick = this.onClick.bind(this)
     }
-    const onMouseLeaveSquare = () => {
-        setId('blueBackground')
-        setHover(false)
+
+    onMouseEnterSquare() {
+        this.setState({
+            id: 'redBackground',
+            hover: true
+        })
     }
-        let idState
-        if(hover)
-            idState = id
+
+    onMouseLeaveSquare() {
+        this.setState({
+            id: 'blueBackground',
+            hover: false
+        })
+    }
+
+    onClick() {
+        this.props.onClick()
+    }
+    shouldComponentUpdate(nextProps, nextState, nextContext)
+    {
+        if(nextState.id !== this.state.id)
+            return true
+        else return nextProps.id !== this.props.id;
+    }
+    render() {
+        let stateId
+        if(!this.state.hover)
+            stateId = this.props.id
         else
-            idState = props.id
+            stateId = this.state.id
+        console.log("This is state.id " + stateId)
+
         return (
             <Button
-                variant = "secondary"
+                variant="secondary"
                 className="square"
-                id = {idState}
-                onMouseEnter = {onMouseEnterSquare.bind()}
-                onMouseLeave = {onMouseLeaveSquare.bind()}
-                onClick = {props.onClick}>
+                id={stateId}
+                onMouseEnter={this.onMouseEnterSquare.bind()}
+                onMouseLeave={this.onMouseLeaveSquare.bind()}
+                onClick={this.onClick.bind()}>
             </Button>
         )
+    }
 }
 
 export default Square

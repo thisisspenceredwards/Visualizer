@@ -26,10 +26,14 @@
 {
   background-color: red;
 }
+#gold
+{
+  background-color: gold;
+}
 .square {
-  height: 7vh;
-  width: 7vh;
-  margin: 0.1vh;
+  height: 5vh;
+  width: 5vh;
+
 }
 .game {
   width: 100%;
@@ -43,8 +47,10 @@
 .game-info {
   margin-left: 2vh;
 }
+
 .btn {
-  margin: 0.1vh;
+
+  padding: 0;
 }
 
 /*.square:focus{

@@ -10,21 +10,25 @@ class Game extends React.Component {
     {
         super(props)
         this.state =({
-            height : 5,
-            width : 5,
+            height : 20,
+            width : 20,
         })
     }
     render() {
         return (
-            <ToastProvider autoDismissTimeout={2000} placement="bottom-center">
+
             <div id ="body" className="game">
+
                 <div className="game-board">
-                    <Board height = {this.state.height} width = {this.state.width}/>
+                    <ToastProvider autoDismissTimeout={2000} placement="bottom-center">
+                        <Board height = {this.state.height} width = {this.state.width}/>
+                    </ToastProvider>
                 </div>
+
                 <div className="game-info">
                 </div>
             </div>
-            </ToastProvider>
+
         );
     }
 }
