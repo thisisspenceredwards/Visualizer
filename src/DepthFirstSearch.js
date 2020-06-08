@@ -39,24 +39,16 @@ export default class DepthFirstSearch
 
     createContainer(size, width, blockedNodes)
     {//diagonals are also valid
-        console.log("CREATE CONTAINER")
+        //console.log("CREATE CONTAINER")
         let dict = {}
-        console.log("this is blockedNodes:" + blockedNodes)
+        //console.log("this is blockedNodes:" + blockedNodes)
         for(let i = 0; i < size; i++)
         {
             if(blockedNodes[i] === true) {
-                console.log("index is blocked:" + i)
+                //console.log("index is blocked:" + i)
                 dict[i] = []
             }
             else {
-                /*let iPlusOne = i + 1
-                let iMinusOne = i - 1
-                let iMinusWidth = i - width
-                let iMinusWidthMinusOne = i - 1
-                let iMinusWidthPlusOne = i - width + 1
-                let iPlusWidth = i + width
-                let iPlusWidthMinusOne = i + width - 1
-                let iPlusWidthPlusOne = i + width + 1*/
                 let tempMap = new Map()
                 tempMap.set("iPlusOne", i + 1)
                 tempMap.set("iMinusOne", i - 1)
@@ -66,15 +58,12 @@ export default class DepthFirstSearch
                 tempMap.set("iPlusWidth", i + width)
                 tempMap.set("iPlusWidthMinusOne", i + width - 1)
                 tempMap.set("iPlusWidthPlusOne", i + width + 1)
-                /* let tempDict = {iPlusOne: i+1, iMiusOne: i-1, iMinusWidth: i-width, iMinusWidthMinusOne: i-width-1, iMinusWidthPlusOne: i-width+1,
-                                 iPlusWidth: i+width, iPlusWidthMinusOne: i+width-1, iPlusWidthPlusOne: i+width+1}*/
                 for (let [key, value] of tempMap) {
                     if (blockedNodes[value] === true || value < 0 || value >= size) {
                         console.log("setting key/value to -1:" + key + ":" + value)
                         tempMap.set(key, -1)
                     }
                 }
-
                 if (i < width) {
                     if (i < width && i % width === 0) { //top left
                         dict[i] = [tempMap.get("iPlusOne"), tempMap.get("iPlusWidth"), tempMap.get("iPlusWidthPlusOne")]
@@ -82,41 +71,32 @@ export default class DepthFirstSearch
                     } else if (i < width && width % i === 1) //top right
                     {
                         dict[i] = [tempMap.get("iMinusOne"), tempMap.get("iPlusWidthMinusOne"), tempMap.get("iPlusWidth")]
-                        //dict[i] = [i - 1, i + width - 1, i + width]
                     } else //first row in the middle
                     {
                         dict[i] = [tempMap.get("iMinusOne"), tempMap.get("iPlusOne"), tempMap.get("iPlusWidthMinusOne"), tempMap.get("iPlusWidth"), tempMap.get("iPlusWidthPlusOne")]
-                        //dict[i] = [i - 1, i + 1, i + width - 1, i + width, i + width + 1]
                     }
                 } else if (i >= size - width) {
                     if (i % width === 0) //bottom left
                     {
                         dict[i] = [tempMap.get("iMinusWidth"), tempMap.get("iMinusWidthPlusOne"), tempMap.get("iPlusOne")]
-                        //dict[i] = [i - width, i - width + 1, i + 1]
                     }
                     else if (i === size - 1) //right side
                     {
                         dict[i] = [tempMap.get("iMinusWidthMinusOne"), tempMap.get("iMinusWidth"), tempMap.get("iMinusWidthPlusOne"), tempMap.get("iMinusOne"), tempMap.get("iPlusOne")]
-                        //dict[i] = [i - width - 1, i - width, i - 1]
                     } else //a center node in the last row
                     {
                         dict[i] = [tempMap.get("iMinusWidthMinusOne"), tempMap.get("iMinusWidth"), tempMap.get("iMinusWidthPlusOne"), tempMap.get("iMinusOne"), tempMap.get("iPlusOne")]
-                        //dict[i] = [i - width - 1, i - width, i - width + 1, i - 1, i + 1]
                     }
                 } else //should be in the center somewhere
                 {
                     if (i % width === 0)//left side not top or bottom row
                     {
                         dict[i] = [tempMap.get("iMinusWidth"), tempMap.get("iMinusWidthPlusOne"), tempMap.get("iPlusOne"), tempMap.get("iPlusWidth"), tempMap.get("iPlusWidthPlusOne")]
-                        //dict[i] = [i - width, i - width + 1, i + 1, i + width, i + width + 1]
                     } else if (i % width === width - 1) //right side not top or bottom row
                     {
                         dict[i] = [tempMap.get("iMinusWidthMinusOne"), tempMap.get("iMinusWidth"), tempMap.get("iMinusOne"), tempMap.get("iPlusWidthMinusOne"), tempMap.get("iPlusWidth")]
-                        //dict[i] = [i - width - 1, i - width, i - 1, i + width - 1, i + width]
                     } else {
                         dict[i] = [tempMap.get("iMinusWidthMinusOne"), tempMap.get("iMinusWidth"), tempMap.get("iMinusWidthPlusOne"), tempMap.get("iMinusOne"), tempMap.get("iPlusOne"), tempMap.get("iPlusWidthMinusOne"), tempMap.get("iPlusWidth"), tempMap.get("iPlusWidthPlusOne")]
-                        //dict[i] = [i - width - 1, i - width, i - width + 1, i - 1, i + 1, i + width - 1, i + width, i + width + 1]
-
                     }
                 }
                 dict[i].sort()
@@ -133,13 +113,9 @@ export default class DepthFirstSearch
                 const set = new Set(dict[i])
                 dict[i] = [...set]
             }
-
         }
         return dict
     }
-
-
-
 }
 
 

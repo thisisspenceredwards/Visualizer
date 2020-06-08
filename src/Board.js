@@ -41,7 +41,7 @@ const Board = (props) => {
         }
         timerID2 = setInterval (
             () => tick2(arr),
-            500
+            10
         )
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) =>
