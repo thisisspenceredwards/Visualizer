@@ -1,13 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useToasts} from "react-toast-notifications";
 import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
+
+
 const Board = (props) => {
-    let [squares, setSquares] = useState(Array(props.height * props.width).fill(null))
+    const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
+    let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
     const [clicked, setClicked] = useState(false)
+    const [barrier, setBarrier] = useState(false)
     const { addToast } = useToasts()
     let animate = (arr) =>
     {
@@ -24,12 +28,12 @@ const Board = (props) => {
         const tick2 = (tickArr) => {
             if(tickIndex < tickArr.length-1){
                 //mutating the array directly :/
-                squares[tickArr[tickIndex]] = 'D'
+                squares[tickArr[tickIndex]] = 'green'
                 tickIndex++
                 setSquares(squares.slice())
             }
             else {
-                squares[tickArr[tickArr.length-1]] = 'G'
+                squares[tickArr[tickArr.length-1]] = 'gold'
                 setSquares(squares.slice())
                 clearTickInterval(timerID2)
                 setClicked(false)
@@ -37,50 +41,27 @@ const Board = (props) => {
         }
         timerID2 = setInterval (
             () => tick2(arr),
-            0
+            500
         )
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) =>
     {
         setClicked(true)
         const k = new DepthFirstSearch()
-        let dict = k.createContainer(SIZE, WIDTH)
+        let dict = k.createContainer(SIZE, WIDTH, blockedNodes )
         let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
         animate(shortestPath)
     }
     let renderSquare = (count) => {
+
         let state = 'slateGrey'
-        if(squares[count] === 'G')
-        {
-            state = 'gold'
-        }
-        else if(squares[count] === 'D')
-        {
-            state = 'green'
-        }
-        else if(squares[count] === 'Z')
-        {
-            state = 'maroon'
-        }
+        if(squares[count] === 'gold' || squares[count] === 'green' || squares[count] === 'black')
+            state = squares[count]
         else if(count === startMarkerIndex)
-        {
             state = 'startMarker'
-        }
         else if(count === endMarkerIndex)
-        {
             state = 'endMarker'
-        }
-        else if(squares !== undefined)
-        {
-            if(squares[count] === 'A') {
-                state = 'green'
-            }
-            else if(squares[count] === 'B')
-            {
-                state = 'maroon'
-            }
-        }
-        return (<Square id = {state} onClick = {SetMarker.bind(this, count)} key = {count}/>)
+        return (<Square id = {state} index = { count} onClick = {SetMarker.bind(this, count)} key = {count}/>)
     }
     let SetMarker = (i) => {
         console.log("Set Marker")
@@ -88,7 +69,15 @@ const Board = (props) => {
         let arr = squares.slice()
         let startStateMarker = startMarkerIndex;
         let endStateMarker = endMarkerIndex;
-        if(startStateMarker === i)
+        if(barrier) {
+            blockedNodes[i] = true
+            setBlockedNodes(blockedNodes.slice())
+            squares[i] = 'black'
+            setSquares(squares.slice())
+            console.log("boards: " + blockedNodes)
+            return
+        }
+        else if(startStateMarker === i)
         {
             startStateMarker = -1
             arr[i] = undefined
@@ -96,23 +85,23 @@ const Board = (props) => {
         }
         else if(startStateMarker < 0 && endStateMarker === i) {
             endStateMarker = -1
-            arr[i] = undefined
+            //arr[i] = undefined
             toastMessage = "Deselected End Location"
         }
         else if(startStateMarker < 0)
         {
             startStateMarker = i
-            arr[i] = 'O'
+            //arr[i] = 'O'
             toastMessage = "Start Location Selected"
         }
         else if(endStateMarker === i) {
             endStateMarker = -1
-            arr[i] = undefined
+            //arr[i] = undefined
             toastMessage = "Deselected End Location"
         }
         else if(endStateMarker < 0) {
             endStateMarker = i
-            arr[i] = 'X'
+            //arr[i] = 'X'
             toastMessage = "Selected End Location"
         }
         else
@@ -166,7 +155,7 @@ const Board = (props) => {
         setClicked(true)
         timerID = setInterval (
             () => tick(dict),
-            75
+            1000
         )
     }
     const clearGraph = () =>
@@ -175,8 +164,44 @@ const Board = (props) => {
         setSquares(Array(props.height * props.width).fill(null))
         setStartMarkerIndex(-1)
         setEndMarkerIndex(-1)
+        setBlockedNodes(Array(props.height * props.width).fill(false))
+    }
+    const createBarrier = () =>
+    {
+        setBarrier(!barrier)
+        if(barrier)
+            document.getElementById("barrier").innerText = "Enable Barrier"
+        else
+            document.getElementById("barrier").innerText = "Disable Barrier"
+    }
+   /* const OnUpdate = (startMarkerIndex) =>
+    {
+        useEffect(() =>
+        {
+            let hell  = parent[1]
+            console.log(hell)
+        })
+    }*/
+
+
+    /*const OnMount = () => {
+        useEffect(() => {
+            let parent = []
+            let count = 0
+            for (let i = 0; i < HEIGHT; i++) {
+                let children = []
+                for (let j = 0; j < WIDTH; j++) {
+                    children.push(renderSquare(count))
+                    count++
+                }
+                parent.push(<div key={i} className={"board-row"}>{children}</div>)
+            }
+            setParent(parent)
+        }, [])
 
     }
+    OnMount()*/
+    //OnUpdate(startMarkerIndex)
     let parent = []
     let count = 0
     const HEIGHT = props.height
@@ -192,12 +217,14 @@ const Board = (props) => {
         }
         parent.push(<div key = {i}  className={"board-row"}>{children}</div>)
     }
+    console.log("yoyoyoyo")
     return (
         <div>
             {parent}
             <Button onClick = {animateAdjacentNodes.bind(this, SIZE, WIDTH, HEIGHT)} > click me!</Button>
             <Button onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >DFS</Button>
             <Button onClick = {clearGraph.bind(this)}>Clear Graph</Button>
+            <Button id = "barrier" onClick = { createBarrier.bind(this)}>Barrier</Button>
         </div>
     );
 }
