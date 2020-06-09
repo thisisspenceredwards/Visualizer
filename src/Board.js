@@ -230,9 +230,6 @@ const Board = (props) => {
 */
     return (
         <div id={"box"}>
-        <div id={"leftBox"}>
-         {parent}
-        </div>
             <div id={"rightBox"}>
                 <div className = "btn-group-vertical" role={"group"}>
                     <div className="btn-group" role="group">
@@ -241,7 +238,7 @@ const Board = (props) => {
                             Algorithms
                         </button>
                         <div className={menuClass} aria-labelledby="btnGroupDrop1">
-                            <a className = "dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</a>
+                            <a className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</a>
                         </div>
                     </div>
                     <Button className = "controlButton" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</Button>
@@ -249,6 +246,10 @@ const Board = (props) => {
                     <Button className = "controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                 </div>
             </div>
+        <div id={"leftBox"}>
+         {parent}
+        </div>
+
 
         </div>
     );
