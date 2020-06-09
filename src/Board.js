@@ -3,6 +3,7 @@ import {useToasts} from "react-toast-notifications";
 import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
+import createContainer from "./CreateContainer"
 
 
 const Board = (props) => {
@@ -52,7 +53,7 @@ const Board = (props) => {
         }
         setClicked(true)
         const k = new DepthFirstSearch()
-        let dict = k.createContainer(SIZE, WIDTH, blockedNodes)
+        let dict = createContainer(SIZE, WIDTH, blockedNodes)
         let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
         animate(shortestPath)
     }
@@ -141,7 +142,7 @@ const Board = (props) => {
             }
         }
         const k = new DepthFirstSearch()
-        let dict = k.createContainer(SIZE, WIDTH, HEIGHT)
+        let dict = createContainer(SIZE, WIDTH, HEIGHT)
         setClicked(true)
         timerID = setInterval(
             () => tick(dict),
