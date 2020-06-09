@@ -46,6 +46,14 @@ const Board = (props) => {
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) =>
     {
+        if(startMarkerIndex < 0 && endMarkerIndex < 0)
+        {
+            return (
+                addToast("Please select a starting and ending location first", {
+                    appearance: 'warning',
+                    autoDismiss: true,
+                }))
+        }
         setClicked(true)
         const k = new DepthFirstSearch()
         let dict = k.createContainer(SIZE, WIDTH, blockedNodes )
@@ -170,7 +178,7 @@ const Board = (props) => {
     {
         setBarrier(!barrier)
         if(barrier)
-            document.getElementById("barrier").innerText = "Enable Barrier"
+            document.getElementById("barrier").innerText = "Draw Barrier"
         else
             document.getElementById("barrier").innerText = "Disable Barrier"
     }
@@ -217,14 +225,12 @@ const Board = (props) => {
         }
         parent.push(<div key = {i}  className={"board-row"}>{children}</div>)
     }
-    console.log("yoyoyoyo")
     return (
         <div>
             {parent}
-            <Button onClick = {animateAdjacentNodes.bind(this, SIZE, WIDTH, HEIGHT)} > click me!</Button>
-            <Button onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >DFS</Button>
+            <Button onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</Button>
             <Button onClick = {clearGraph.bind(this)}>Clear Graph</Button>
-            <Button id = "barrier" onClick = { createBarrier.bind(this)}>Barrier</Button>
+            <Button id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
         </div>
     );
 }

@@ -39,13 +39,10 @@ export default class DepthFirstSearch
 
     createContainer(size, width, blockedNodes)
     {//diagonals are also valid
-        //console.log("CREATE CONTAINER")
         let dict = {}
-        //console.log("this is blockedNodes:" + blockedNodes)
         for(let i = 0; i < size; i++)
         {
             if(blockedNodes[i] === true) {
-                //console.log("index is blocked:" + i)
                 dict[i] = []
             }
             else {
