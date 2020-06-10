@@ -264,7 +264,6 @@ const Board = (props) => {
                             <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Breath-First Search</a>
                         </div>
                     </div>
-                    <Button className = "controlButton" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</Button>
                     <Button className = "controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                 </div>
