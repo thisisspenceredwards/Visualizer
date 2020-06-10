@@ -4,6 +4,7 @@ import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
 import createContainer from "./CreateContainer"
+import BreathFirstSearch from "./BreathFirstSearch"
 
 
 const Board = (props) => {
@@ -22,7 +23,6 @@ const Board = (props) => {
             return
         }
         const clearTickInterval = () => {
-            console.log("clear)")
             clearInterval(timerID2)
         }
         const tick2 = (tickArr) => {
@@ -43,13 +43,50 @@ const Board = (props) => {
             10
         )
     }
-    let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
+    const checkForValidMarkers = () =>
+    {
         if (startMarkerIndex < 0 && endMarkerIndex < 0) {
             return (
                 addToast("Please select a starting and ending location first", {
                     appearance: 'warning',
                     autoDismiss: true,
                 }))
+        }
+        else return null
+    }
+    let resetArr = () =>
+    {
+        const tempArr = squares.slice()
+        for(let i = 0; i < squares.length; i++)
+        {
+            if(tempArr[i] === 'green')
+            {
+                tempArr[i] = false
+            }
+        }
+        console.log(tempArr)
+        setSquares(tempArr.slice())
+
+    }
+    let breathFirstSearch = (SIZE, HEIGHT, WIDTH) => {
+        resetArr()
+         const valid =checkForValidMarkers()
+        if(valid!== null)
+        {
+            return valid
+        }
+        setClicked(true)
+        const k = new BreathFirstSearch()
+        let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
+        animate(shortestPath)
+    }
+    let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
+        resetArr()
+        const valid =checkForValidMarkers()
+        if(valid!== null)
+        {
+            return valid
         }
         setClicked(true)
         const k = new DepthFirstSearch()
@@ -206,28 +243,7 @@ const Board = (props) => {
     }
     const toggleOpen = () => setDropDownMenu(!dropDownMenu)
     const menuClass = `dropdown-menu ${ dropDownMenu? " show": ""}`
-    console.log(menuClass)
-    /*
-    return (
-        <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
-            <button type="button" className="btn btn-secondary">1</button>
-            <button type="button" className="btn btn-secondary">2</button>
-
-            <div className="btn-group" role="group">
-                <button id="btnGroupDrop1" type="button" onClick = {toggleOpen.bind(this)} className="btn btn-secondary dropdown-toggle"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown
-                </button>
-                <div className={menuClass} aria-labelledby="btnGroupDrop1" >
-                    <a className="dropdown-item" href="#">Dropdown link</a>
-                    <a className="dropdown-item" href="#">Dropdown link</a>
-                    <a className = "dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search </a>
-                </div>
-            </div>
-        </div>
-    )
-}
-*/
+    console.log("re rendering)")
     return (
         <div id={"box"}>
             <div id={"rightBox"}>
@@ -239,6 +255,7 @@ const Board = (props) => {
                         </button>
                         <div className={menuClass} aria-labelledby="btnGroupDrop1">
                             <a className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</a>
+                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Breath-First Search</a>
                         </div>
                     </div>
                     <Button className = "controlButton" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</Button>

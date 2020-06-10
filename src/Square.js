@@ -90,7 +90,7 @@ class Square extends React.Component {
             stateId = this.props.id
         else
             stateId = this.state.id
-        console.log("This is state.id " + stateId)
+        //console.log("This is state.id " + stateId)
 
         return (
             <Button

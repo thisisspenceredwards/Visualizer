@@ -10,6 +10,7 @@ const createContainer = (size, width, blockedNodes)=>
             dict[i] = []
         }
         else {
+            //A map was likely unnecessary here, but it made keeping track of everything much easier
             let tempMap = new Map()
             tempMap.set("iPlusOne", i + 1)
             tempMap.set("iMinusOne", i - 1)
@@ -21,7 +22,7 @@ const createContainer = (size, width, blockedNodes)=>
             tempMap.set("iPlusWidthPlusOne", i + width + 1)
             for (let [key, value] of tempMap) {
                 if (blockedNodes[value] === true || value < 0 || value >= size) {
-                    console.log("setting key/value to -1:" + key + ":" + value)
+                   // console.log("setting key/value to -1:" + key + ":" + value)
                     tempMap.set(key, -1)
                 }
             }
