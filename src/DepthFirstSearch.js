@@ -17,11 +17,11 @@ export default class DepthFirstSearch
         visited[start] = true
         orderOfSearch.push(start) //this is to track the order of visited nodes
 
-        for(let i = 0; i < dictionary[start].length; i++)
+        for(let i = 0; i < dictionary[start][0].length; i++)
         {
-            if(dictionary[i] !== -1 && visited[dictionary[start][i]] === false)
+            if(dictionary[i][0] !== -1 && visited[dictionary[start][0][i]] === false)
             {
-                this.DFSUtil(visited, dictionary[start][i], end, dictionary, found, orderOfSearch)
+                this.DFSUtil(visited, dictionary[start][0][i], end, dictionary, found, orderOfSearch)
             }
         }
     }

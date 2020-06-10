@@ -73,7 +73,8 @@ const createContainer = (size, width, blockedNodes)=>
                 j++
             }
             const set = new Set(dict[i])
-            dict[i] = [...set]
+            dict[i] = [[...set], null]
+            console.log(dict[i])
         }
     }
     return dict

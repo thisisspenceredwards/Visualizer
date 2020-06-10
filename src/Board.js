@@ -17,7 +17,8 @@ const Board = (props) => {
     const [clicked, setClicked] = useState(false)
     const [barrier, setBarrier] = useState(false)
     const {addToast} = useToasts()
-    let animate = (arr) => {
+
+    let animateWithoutReturnPath = (arr) => {
         clearSquares()
         reDrawBarrier()
         let tickIndex = 1
@@ -46,6 +47,56 @@ const Board = (props) => {
             10
         )
     }
+
+    let animateWithReturnPath = (arr) => {
+        const findPathArr = arr[0]
+        const shortestPathArr = arr[1]
+        clearSquares()
+        reDrawBarrier()
+        let tickIndex = 1
+        let timerID2
+        if (clicked === true) {
+            return
+        }
+        const clearTickInterval = () => {
+            clearInterval(timerID2)
+        }
+        let finishedAnimatingFindPath = false
+        const tick2 = (findPathArr, shortestPathArr) => {
+            if(!finishedAnimatingFindPath) {
+                if (tickIndex < findPathArr.length - 1) {
+                    //mutating the array directly :/
+                    squares[findPathArr[tickIndex]] = 'green'
+                    tickIndex++
+                    setSquares(squares.slice())
+                } else {
+                    finishedAnimatingFindPath = true
+                    squares[findPathArr[findPathArr.length - 1]] = 'gold'
+                    setSquares(squares.slice())
+                    tickIndex = 0
+                }
+            }
+            else
+            {
+                if(tickIndex < shortestPathArr.length - 1)
+                {
+                    squares[shortestPathArr[tickIndex]] = 'gold'
+                    setSquares(squares.slice())
+                    tickIndex++
+                }
+                else{
+                    squares[shortestPathArr[shortestPathArr.length - 1]] = 'gold'
+                    setSquares(squares.slice())
+                    clearTickInterval(timerID2)
+                    setClicked(false)
+                }
+            }
+        }
+        timerID2 = setInterval(
+            () => tick2(findPathArr, shortestPathArr),
+            10
+        )
+    }
     const checkForValidMarkers = () => {
         if (startMarkerIndex < 0 && endMarkerIndex < 0) {
             return (
@@ -65,7 +116,7 @@ const Board = (props) => {
         const k = new BreathFirstSearch()
         let dict = createContainer(SIZE, WIDTH, blockedNodes)
         let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        animate(shortestPath)
+        animateWithReturnPath(shortestPath)
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
         const valid =checkForValidMarkers()
@@ -77,7 +128,7 @@ const Board = (props) => {
         const k = new DepthFirstSearch()
         let dict = createContainer(SIZE, WIDTH, blockedNodes)
         let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        animate(shortestPath)
+        animateWithoutReturnPath(shortestPath)
     }
     let renderSquare = (count) => {
 
