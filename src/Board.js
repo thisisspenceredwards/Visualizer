@@ -8,6 +8,7 @@ import BreathFirstSearch from "./BreathFirstSearch"
 
 
 const Board = (props) => {
+    //can likely optimize blockedNodes
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
@@ -17,6 +18,8 @@ const Board = (props) => {
     const [barrier, setBarrier] = useState(false)
     const {addToast} = useToasts()
     let animate = (arr) => {
+        clearSquares()
+        reDrawBarrier()
         let tickIndex = 1
         let timerID2
         if (clicked === true) {
@@ -43,34 +46,17 @@ const Board = (props) => {
             10
         )
     }
-    const checkForValidMarkers = () =>
-    {
+    const checkForValidMarkers = () => {
         if (startMarkerIndex < 0 && endMarkerIndex < 0) {
             return (
                 addToast("Please select a starting and ending location first", {
                     appearance: 'warning',
                     autoDismiss: true,
                 }))
-        }
-        else return null
-    }
-    let resetArr = () =>
-    {
-        const tempArr = squares.slice()
-        for(let i = 0; i < squares.length; i++)
-        {
-            if(tempArr[i] === 'green')
-            {
-                tempArr[i] = false
-            }
-        }
-        console.log(tempArr)
-        setSquares(tempArr.slice())
-
+        } else return null
     }
     let breathFirstSearch = (SIZE, HEIGHT, WIDTH) => {
-        resetArr()
-         const valid =checkForValidMarkers()
+        const valid =checkForValidMarkers()
         if(valid!== null)
         {
             return valid
@@ -82,7 +68,6 @@ const Board = (props) => {
         animate(shortestPath)
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
-        resetArr()
         const valid =checkForValidMarkers()
         if(valid!== null)
         {
@@ -106,7 +91,6 @@ const Board = (props) => {
         return (<Square id={state} index={count} onClick={SetMarker.bind(this, count)} key={count}/>)
     }
     let SetMarker = (i) => {
-        console.log("Set Marker")
         let toastMessage = ""
         let arr = squares.slice()
         let startStateMarker = startMarkerIndex;
@@ -151,7 +135,7 @@ const Board = (props) => {
             }))
     }
 
-
+/*
     const animateAdjacentNodes = (SIZE, WIDTH, HEIGHT) => {
         let tickIndex = 0
         let timerID
@@ -186,12 +170,34 @@ const Board = (props) => {
             1000
         )
     }
-    const clearGraph = () => {
-        //exit = true
+    */
+    const clearSquares = () => {
+        //squares not changing without setting squares explicitly
+        squares = Array(props.height * props.width).fill(null)
         setSquares(Array(props.height * props.width).fill(null))
+
+    }
+    const reDrawBarrier = () =>{
+        for(let i = 0; i < squares.length; i++)
+        {
+            if(blockedNodes[i] === true)
+            {
+                squares[i] = 'black'
+            }
+        }
+        setSquares(Array(squares.slice()))
+    }
+    const clearBarrier = () => {
+        setBlockedNodes(Array(props.height * props.width).fill(false))
+    }
+    const clearMarkers = () => {
         setStartMarkerIndex(-1)
         setEndMarkerIndex(-1)
-        setBlockedNodes(Array(props.height * props.width).fill(false))
+    }
+    const clearGraph = () => {
+        clearSquares()
+        clearBarrier()
+        clearMarkers()
     }
     const createBarrier = () => {
         setBarrier(!barrier)
