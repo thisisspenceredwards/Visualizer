@@ -1,3 +1,18 @@
+6/10
+implemented DFS
+implemented BFS w/ return path
+implemented barriers
+updated UI
+React hooks working
+
+Todo:
+More algorithms
+Improve UI
+test test test
+begin working on backend
+optomize react (unnecessary renders still happening)
+
+
 6/2
 Created prototype grid
 Created start location and end location
