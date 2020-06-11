@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Square from "./Square"
 import createContainer from "./CreateContainer"
 import BreathFirstSearch from "./BreathFirstSearch"
+import Dijkstra from "./Dijkstra"
 
 
 const Board = (props) => {
@@ -123,7 +124,19 @@ const Board = (props) => {
                 }))
         } else return null
     }
-    let breathFirstSearch = (SIZE, HEIGHT, WIDTH) => {
+    let dijkstras = () =>
+    {
+        const valid = checkForValidMarkers()
+        if(valid !== null)
+        {
+            return valid
+        }
+        setClicked(true)
+        const k = new Dijkstra()
+        let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        let shortestPath = k.Dijkstra(startMarkerIndex, endMarkerIndex, dict, weights, SIZE)
+    }
+    let breathFirstSearch = () => {
         const valid =checkForValidMarkers()
         if(valid!== null)
         {
@@ -298,9 +311,11 @@ const Board = (props) => {
                             <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Breath-First Search
                                 <p>(Least Cost Path)</p>
+                                <p> Not Yet Implemented</p>
                             </a>
                             <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Dijkstra's SPF
+                                <p> Not Yet Implemented</p>
                             </a>
                         </div>
                     </div>
