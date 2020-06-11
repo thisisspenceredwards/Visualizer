@@ -30,6 +30,10 @@ export default class DepthFirstSearch
         let orderOfSearch = []
         let found = [false]
         this.DFSUtil(visited, start, end, dictionary, found, orderOfSearch)
+        if(found[0] === false)
+        {
+            return [...orderOfSearch, false]
+        }
         return orderOfSearch
     }
 }

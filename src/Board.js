@@ -38,10 +38,19 @@ const Board = (props) => {
                 tickIndex++
                 setSquares(squares.slice())
             } else {
-                squares[tickArr[tickArr.length - 1]] = 'gold'
-                setSquares(squares.slice())
+                console.log(squares)
                 clearTickInterval(timerID2)
                 setClicked(false)
+                if(tickArr[tickArr.length - 1] === false) {
+                    return (
+                        addToast("Path does not exist", {
+                            appearance: 'warning',
+                            autoDismiss: true,
+                        }))
+                }
+                squares[tickArr[tickArr.length - 1]] = 'gold'
+                setSquares(squares.slice())
+
             }
         }
         timerID2 = setInterval(
@@ -104,6 +113,7 @@ const Board = (props) => {
             10
         )
     }
+
     const checkForValidMarkers = () => {
         if (startMarkerIndex < 0 && endMarkerIndex < 0) {
             return (
@@ -227,6 +237,10 @@ const Board = (props) => {
     }
     const createBarrier = () => {
         setBarrier(!barrier)
+        if(weightButton)
+        {
+            setWeightButtonFunction()
+        }
         if (barrier)
             document.getElementById("barrier").innerText = "Draw Barrier"
         else
@@ -236,6 +250,10 @@ const Board = (props) => {
     const setWeightButtonFunction = () =>
     {
         setWeightButton(!weightButton)
+        if(barrier)
+        {
+            createBarrier()
+        }
         if(weightButton)
             document.getElementById("addWeights").innerText = "Set Weights"
         else
@@ -243,34 +261,6 @@ const Board = (props) => {
 
     }
 
-    /* const OnUpdate = (startMarkerIndex) =>
-     {
-         useEffect(() =>
-         {
-             let hell  = parent[1]
-             console.log(hell)
-         })
-     }*/
-
-
-    /*const OnMount = () => {
-        useEffect(() => {
-            let parent = []
-            let count = 0
-            for (let i = 0; i < HEIGHT; i++) {
-                let children = []
-                for (let j = 0; j < WIDTH; j++) {
-                    children.push(renderSquare(count))
-                    count++
-                }
-                parent.push(<div key={i} className={"board-row"}>{children}</div>)
-            }
-            setParent(parent)
-        }, [])
-
-    }
-    OnMount()*/
-    //OnUpdate(startMarkerIndex)
     let parent = []
     let count = 0
     const HEIGHT = props.height
@@ -297,8 +287,21 @@ const Board = (props) => {
                             Algorithms
                         </button>
                         <div className={menuClass} aria-labelledby="btnGroupDrop1">
-                            <a className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Depth First Search</a>
-                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Breath-First Search</a>
+                            <a className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Depth First Search
+                                <p> (Does path Exist)</p>
+                          </a>
+                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Breath-First Search
+                                <p>(Shortest Path)</p>
+                            </a>
+                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Breath-First Search
+                                <p>(Least Cost Path)</p>
+                            </a>
+                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Dijkstra's SPF
+                            </a>
                         </div>
                     </div>
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
@@ -316,3 +319,33 @@ const Board = (props) => {
 }
 
 export default Board
+
+
+/* const OnUpdate = (startMarkerIndex) =>
+ {
+     useEffect(() =>
+     {
+         let hell  = parent[1]
+         console.log(hell)
+     })
+ }*/
+
+
+/*const OnMount = () => {
+    useEffect(() => {
+        let parent = []
+        let count = 0
+        for (let i = 0; i < HEIGHT; i++) {
+            let children = []
+            for (let j = 0; j < WIDTH; j++) {
+                children.push(renderSquare(count))
+                count++
+            }
+            parent.push(<div key={i} className={"board-row"}>{children}</div>)
+        }
+        setParent(parent)
+    }, [])
+
+}
+OnMount()*/
+//OnUpdate(startMarkerIndex)
