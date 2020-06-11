@@ -54,11 +54,13 @@ class Square extends React.Component {
         super(props)
         this.state = {
             hover: false,
-            id: ''
+            id: '',
+            weight: 0
         }
         this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
         this.onMouseLeaveSquare = this.onMouseLeaveSquare.bind(this)
         this.onClick = this.onClick.bind(this)
+        this.setWeight = this.setWeight.bind(this)
     }
 
     onMouseEnterSquare() {
@@ -74,13 +76,21 @@ class Square extends React.Component {
             hover: false
         })
     }
-
+    setWeight(){
+        console.log("set Weight: " + this.props.id)
+        if(this.props.id !== 'startMarker' && this.props.id !== 'endMarker')
+        {
+            this.props.setWeight()
+        }
+    }
     onClick() {
         this.props.onClick()
+        //this.setWeight()
+
     }
     shouldComponentUpdate(nextProps, nextState, nextContext)
     {
-        if(nextState.id !== this.state.id)
+        if(nextState.id !== this.state.id || this.state.weight !== nextProps.weight)
             return true
         else return nextProps.id !== this.props.id;
     }
@@ -90,8 +100,6 @@ class Square extends React.Component {
             stateId = this.props.id
         else
             stateId = this.state.id
-        //console.log("This is state.id " + stateId)
-
         return (
             <Button
                 variant="secondary"
@@ -99,7 +107,7 @@ class Square extends React.Component {
                 id={stateId}
                 onMouseEnter={this.onMouseEnterSquare.bind()}
                 onMouseLeave={this.onMouseLeaveSquare.bind()}
-                onClick={this.onClick.bind()}>
+                onClick={this.onClick.bind()}>{this.props.weight}
             </Button>
         )
     }

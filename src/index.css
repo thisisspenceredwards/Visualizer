@@ -59,7 +59,15 @@
  float:left;
 }
 #rightBox{
+  padding: 1%;
   background-color: cornflowerblue;
+  width : 20%;
+}
+.btn-group-vertical{
+  width: 100%;
+}
+#controlButton{
+
 }
 /*.controlButton {
   float: right;

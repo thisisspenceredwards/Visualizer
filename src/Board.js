@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useToasts} from "react-toast-notifications";
 import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
@@ -11,12 +11,14 @@ const Board = (props) => {
     //can likely optimize blockedNodes
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
+    let [weights, setWeights] = useState(Array(props.height * props.width).fill(0))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [dropDownMenu, setDropDownMenu] = useState(false)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
     const [clicked, setClicked] = useState(false)
     const [barrier, setBarrier] = useState(false)
     const {addToast} = useToasts()
+    const [weightButton, setWeightButton] = useState(false)
 
     let animateWithoutReturnPath = (arr) => {
         clearSquares()
@@ -46,6 +48,11 @@ const Board = (props) => {
             () => tick2(arr),
             10
         )
+    }
+
+    const setWeight = (count) => {
+            weights[count] = weights[count]+1
+            setWeights(weights.slice())
     }
 
     let animateWithReturnPath = (arr) => {
@@ -120,8 +127,7 @@ const Board = (props) => {
     }
     let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
         const valid =checkForValidMarkers()
-        if(valid!== null)
-        {
+        if(valid!== null) {
             return valid
         }
         setClicked(true)
@@ -131,7 +137,6 @@ const Board = (props) => {
         animateWithoutReturnPath(shortestPath)
     }
     let renderSquare = (count) => {
-
         let state = 'slateGrey'
         if (squares[count] === 'gold' || squares[count] === 'green' || squares[count] === 'black')
             state = squares[count]
@@ -139,7 +144,13 @@ const Board = (props) => {
             state = 'startMarker'
         else if (count === endMarkerIndex)
             state = 'endMarker'
-        return (<Square id={state} index={count} onClick={SetMarker.bind(this, count)} key={count}/>)
+        return (<Square id={state} index={count} weight = {weights[count]} onClick={fork.bind(this, count)} key={count}/>)
+    }
+    let fork = (i) => {
+        if(weightButton)
+            setWeight(i)
+        else
+            SetMarker(i)
     }
     let SetMarker = (i) => {
         let toastMessage = ""
@@ -186,42 +197,6 @@ const Board = (props) => {
             }))
     }
 
-/*
-    const animateAdjacentNodes = (SIZE, WIDTH, HEIGHT) => {
-        let tickIndex = 0
-        let timerID
-        if (clicked === true) {
-            return
-        }
-        const clearTickInterval = () => {
-            clearInterval(timerID)
-        }
-        const tick = (tickDictionary) => {
-            let tickSquares = squares.slice()
-            if (tickDictionary !== undefined && tickIndex < Object.keys(tickDictionary).length) {
-                for (let i = 0; i < tickDictionary[tickIndex].length; i++) {
-                    tickSquares[tickDictionary[tickIndex][i]] = 'A'
-                }
-                tickSquares[tickIndex] = 'B'
-                tickIndex++
-                setSquares(tickSquares)
-            } else if (tickIndex === Object.keys(tickDictionary).length) {
-                setSquares(tickSquares)
-                setClicked(false)
-                clearTickInterval()
-            } else {
-                clearTickInterval()
-            }
-        }
-        const k = new DepthFirstSearch()
-        let dict = createContainer(SIZE, WIDTH, HEIGHT)
-        setClicked(true)
-        timerID = setInterval(
-            () => tick(dict),
-            1000
-        )
-    }
-    */
     const clearSquares = () => {
         //squares not changing without setting squares explicitly
         squares = Array(props.height * props.width).fill(null)
@@ -257,6 +232,17 @@ const Board = (props) => {
         else
             document.getElementById("barrier").innerText = "Disable Barrier"
     }
+
+    const setWeightButtonFunction = () =>
+    {
+        setWeightButton(!weightButton)
+        if(weightButton)
+            document.getElementById("addWeights").innerText = "Set Weights"
+        else
+            document.getElementById("addWeights").innerText = "Toggle Weights Off"
+
+    }
+
     /* const OnUpdate = (startMarkerIndex) =>
      {
          useEffect(() =>
@@ -304,7 +290,7 @@ const Board = (props) => {
     return (
         <div id={"box"}>
             <div id={"rightBox"}>
-                <div className = "btn-group-vertical" role={"group"}>
+                <div id = "buttons" className = "btn-group-vertical" role={"group"}>
                     <div className="btn-group" role="group">
                         <button id="btnGroupDrop1" type="button"  onClick = {toggleOpen.bind(this)} className="btn btn-primary dropdown-toggle"
                                 data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
@@ -315,8 +301,9 @@ const Board = (props) => {
                             <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >Breath-First Search</a>
                         </div>
                     </div>
-                    <Button className = "controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
-                    <Button className = "controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
+                    <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
+                    <Button className = "btn btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
+                    <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
                 </div>
             </div>
         <div id={"leftBox"}>
