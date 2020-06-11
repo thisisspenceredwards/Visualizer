@@ -1,7 +1,4 @@
-
-
-
- class Dijkstra {
+ export default class Dijkstra {
 
      constructor()
      {
@@ -15,3 +12,4 @@
 
      }
  }
+
