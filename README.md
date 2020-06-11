@@ -1,3 +1,31 @@
+https://thisisspenceredwards.github.io/Visualizer/
+
+
+6/10
+<br>
+implemented DFS
+<br>
+implemented BFS w/ return path
+<br>
+implemented barriers
+<br>
+updated UI
+<br>
+React hooks working
+
+Todo:
+<br>
+More algorithms
+<br>
+Improve UI
+<br>
+test test test
+<br>
+begin working on backend
+<br>
+optomize react (unnecessary renders still happening)
+
+
 6/2
 Created prototype grid
 Created start location and end location
