@@ -10,10 +10,8 @@ const createContainer = (size, width, blockedNodes)=>
     let dict = {}
     for(let i = 0; i < size; i++)
     {
-        if(blockedNodes[i] === true) {
-            dict[i] = []
-        }
-        else {
+        if(blockedNodes[i] !== true)
+        {
             //A map was likely unnecessary here, but it made keeping track of everything much easier
             let tempMap = new Map()
             tempMap.set("iPlusOne", i + 1)
@@ -26,14 +24,12 @@ const createContainer = (size, width, blockedNodes)=>
             tempMap.set("iPlusWidthPlusOne", i + width + 1)
             for (let [key, value] of tempMap) {
                 if (blockedNodes[value] === true || value < 0 || value >= size) {
-                   // console.log("setting key/value to -1:" + key + ":" + value)
                     tempMap.set(key, -1)
                 }
             }
             if (i < width) {
                 if (i < width && i % width === 0) { //top left
                     dict[i] = [tempMap.get("iPlusOne"), tempMap.get("iPlusWidth"), tempMap.get("iPlusWidthPlusOne")]
-                    //dict[i] = [i + 1, i + width, i + width + 1]
                 } else if (i < width && width % i === 1) //top right
                 {
                     dict[i] = [tempMap.get("iMinusOne"), tempMap.get("iPlusWidthMinusOne"), tempMap.get("iPlusWidth")]
@@ -69,7 +65,6 @@ const createContainer = (size, width, blockedNodes)=>
             let j = 0
             while(dict[i][j] === -1 && j < dict[i].length)
             {
-                //console.log(dict[i][j])
                 if(dict[i][j] === -1)
                 {
                     dict[i].splice(j, 1)
@@ -78,7 +73,6 @@ const createContainer = (size, width, blockedNodes)=>
             }
             const set = new Set(dict[i])
             dict[i] = [[...set], null, i]
-            //console.log(dict[i])
         }
     }
     return dict

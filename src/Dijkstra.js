@@ -6,7 +6,7 @@
           this.visited = Array(size).fill(false)
           this.weights = weights
           this.distances = Array(size).fill(Infinity)
-          this.distances[start] = 0
+          this.distances[start] = -1
           this.dictionary = dictionary
           this.start = start
           this.end = end
@@ -47,6 +47,8 @@
                this.shortestPathBack.push(minWeightIndex)
                this.visited[minWeightIndex] = true
                index = minWeightIndex
+               if(index === -1)
+                    return
           }
           this.shortestPathBack.push(this.start)
      }

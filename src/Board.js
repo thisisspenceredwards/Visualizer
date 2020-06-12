@@ -12,7 +12,7 @@ const Board = (props) => {
     //can likely optimize blockedNodes
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
-    let [weights, setWeights] = useState(Array(props.height * props.width).fill(0))
+    let [weights, setWeights] = useState(Array(props.height * props.width).fill(1))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [dropDownMenu, setDropDownMenu] = useState(false)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
@@ -79,11 +79,12 @@ const Board = (props) => {
             clearInterval(timerID2)
         }
         let finishedAnimatingFindPath = false
+        console.log("this is findPathArr:" + findPathArr)
         const tick2 = (findPathArr, shortestPathArr) => {
             if(!finishedAnimatingFindPath) {
                 if (tickIndex < findPathArr.length) {
                     //mutating the array directly :
-                        squares[findPathArr[tickIndex]] = 'green'
+                    squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
                     setSquares(squares.slice())
                 } else {
@@ -245,7 +246,7 @@ const Board = (props) => {
         setEndMarkerIndex(-1)
     }
     const clearWeights = () => {
-        setWeights(Array(props.height * props.width).fill(0))
+        setWeights(Array(props.height * props.width).fill(1))
     }
     const clearGraph = () => {
         clearSquares()
@@ -320,7 +321,6 @@ const Board = (props) => {
                             </a>
                             <a className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Dijkstra's SPF
-                                <p> Not Yet Implemented</p>
                             </a>
                         </div>
                     </div>
