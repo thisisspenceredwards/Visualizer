@@ -26,9 +26,9 @@ const Board = (props) => {
         reDrawBarrier()
         let tickIndex = 1
         let timerID2
-        if (clicked === true) {
+        if (clicked === true)
             return
-        }
+
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -39,7 +39,6 @@ const Board = (props) => {
                 tickIndex++
                 setSquares(squares.slice())
             } else {
-                console.log(squares)
                 clearTickInterval(timerID2)
                 setClicked(false)
                 if(tickArr[tickArr.length - 1] === false) {
@@ -51,7 +50,6 @@ const Board = (props) => {
                 }
                 squares[tickArr[tickArr.length - 1]] = 'gold'
                 setSquares(squares.slice())
-
             }
         }
         timerID2 = setInterval(
@@ -70,7 +68,7 @@ const Board = (props) => {
         const shortestPathArr = arr[1]
         clearSquares()
         reDrawBarrier()
-        let tickIndex = 1
+        let tickIndex = 0
         let timerID2
         if (clicked === true) {
             return
@@ -79,11 +77,12 @@ const Board = (props) => {
             clearInterval(timerID2)
         }
         let finishedAnimatingFindPath = false
-        console.log("this is findPathArr:" + findPathArr)
         const tick2 = (findPathArr, shortestPathArr) => {
             if(!finishedAnimatingFindPath) {
                 if (tickIndex < findPathArr.length) {
-                    //mutating the array directly :
+                    //mutating the array directly :( doesn't seem to update promptly otherwise
+                    console.log("this is tickIndex: " + tickIndex)
+                    console.log("this is findPathArr[tickIndex]: " + findPathArr[tickIndex])
                     squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
                     setSquares(squares.slice())
@@ -295,7 +294,6 @@ const Board = (props) => {
     }
     const toggleOpen = () => setDropDownMenu(!dropDownMenu)
     const menuClass = `dropdown-menu ${ dropDownMenu? " show": ""}`
-    console.log("re rendering)")
     return (
         <div id={"box"}>
             <div id={"rightBox"}>
