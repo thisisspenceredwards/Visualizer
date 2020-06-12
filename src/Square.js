@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 
 /*
@@ -90,9 +90,9 @@ class Square extends React.Component {
     }
     shouldComponentUpdate(nextProps, nextState, nextContext)
     {
-        if(nextState.id !== this.state.id || this.state.weight !== nextProps.weight)
+        if(nextState.id !== this.state.id || this.props.weight !== nextProps.weight || this.props.id !== nextProps.id)
             return true
-        else return nextProps.id !== this.props.id;
+        return false;
     }
     render() {
         let stateId
@@ -107,7 +107,8 @@ class Square extends React.Component {
                 id={stateId}
                 onMouseEnter={this.onMouseEnterSquare.bind()}
                 onMouseLeave={this.onMouseLeaveSquare.bind()}
-                onClick={this.onClick.bind()}>{this.props.weight}
+                onClick={this.onClick.bind()}>
+                {this.props.weight}
             </Button>
         )
     }

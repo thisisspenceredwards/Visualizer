@@ -1,5 +1,9 @@
 
 
+//A dictionary has an array containing an array of adjacent nodes, and an entry for the node's parent
+// dict = [[adjacent nodes], parentvalue, index of self]
+// index of self is for Dijkstras
+
 
 const createContainer = (size, width, blockedNodes)=>
 {//diagonals are also valid
@@ -65,7 +69,7 @@ const createContainer = (size, width, blockedNodes)=>
             let j = 0
             while(dict[i][j] === -1 && j < dict[i].length)
             {
-                console.log(dict[i][j])
+                //console.log(dict[i][j])
                 if(dict[i][j] === -1)
                 {
                     dict[i].splice(j, 1)
@@ -73,8 +77,8 @@ const createContainer = (size, width, blockedNodes)=>
                 j++
             }
             const set = new Set(dict[i])
-            dict[i] = [[...set], null]
-            console.log(dict[i])
+            dict[i] = [[...set], null, i]
+            //console.log(dict[i])
         }
     }
     return dict

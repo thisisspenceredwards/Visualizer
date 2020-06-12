@@ -81,14 +81,15 @@ const Board = (props) => {
         let finishedAnimatingFindPath = false
         const tick2 = (findPathArr, shortestPathArr) => {
             if(!finishedAnimatingFindPath) {
-                if (tickIndex < findPathArr.length - 1) {
+                if (tickIndex < findPathArr.length) {
                     //mutating the array directly :/
-                    squares[findPathArr[tickIndex]] = 'green'
+                    if(findPathArr[tickIndex] !== endMarkerIndex)
+                        squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
                     setSquares(squares.slice())
                 } else {
                     finishedAnimatingFindPath = true
-                    squares[findPathArr[findPathArr.length - 1]] = 'gold'
+                    squares[endMarkerIndex] = 'gold'
                     setSquares(squares.slice())
                     tickIndex = 0
                 }
@@ -132,9 +133,11 @@ const Board = (props) => {
             return valid
         }
         setClicked(true)
-        const k = new Dijkstra()
+
         let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        let shortestPath = k.Dijkstra(startMarkerIndex, endMarkerIndex, dict, weights, SIZE)
+        const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
+        let shortestPath = k.dijkstra()
+        animateWithReturnPath(shortestPath)
     }
     let breathFirstSearch = () => {
         const valid =checkForValidMarkers()
@@ -185,7 +188,6 @@ const Board = (props) => {
             setBlockedNodes(blockedNodes.slice())
             squares[i] = 'black'
             setSquares(squares.slice())
-            console.log("boards: " + blockedNodes)
             return
         } else if (startStateMarker === i) {
             startStateMarker = -1
@@ -243,10 +245,14 @@ const Board = (props) => {
         setStartMarkerIndex(-1)
         setEndMarkerIndex(-1)
     }
+    const clearWeights = () => {
+        setWeights(Array(props.height * props.width).fill(0))
+    }
     const clearGraph = () => {
         clearSquares()
         clearBarrier()
         clearMarkers()
+        clearWeights()
     }
     const createBarrier = () => {
         setBarrier(!barrier)
@@ -313,7 +319,7 @@ const Board = (props) => {
                                 <p>(Least Cost Path)</p>
                                 <p> Not Yet Implemented</p>
                             </a>
-                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <a className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Dijkstra's SPF
                                 <p> Not Yet Implemented</p>
                             </a>
