@@ -82,8 +82,7 @@ const Board = (props) => {
         const tick2 = (findPathArr, shortestPathArr) => {
             if(!finishedAnimatingFindPath) {
                 if (tickIndex < findPathArr.length) {
-                    //mutating the array directly :/
-                    if(findPathArr[tickIndex] !== endMarkerIndex)
+                    //mutating the array directly :
                         squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
                     setSquares(squares.slice())

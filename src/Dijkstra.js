@@ -2,6 +2,8 @@
 
      constructor(weights, dictionary, start, end, size)
      {
+          this.searchingVisited = Array(size).fill(false)
+          this.visited = Array(size).fill(false)
           this.weights = weights
           this.distances = Array(size).fill(Infinity)
           this.distances[start] = 0
@@ -16,6 +18,7 @@
      }
      dijkstra(){
           this.dijkstraUtil()
+          this.computeShortestPath()
           //return this.orderOfSearch
           return [this.orderOfSearch, this.shortestPathBack]
           //return this.shortestPathBack
@@ -27,18 +30,22 @@
           this.shortestPathBack.push(this.end)
           while(index !== this.start)
           {
+               console.log("This is the dictionary: " + this.dictionary[index][0])
                console.log("this is index: " + index)
                let minWeight = Infinity
                let minWeightIndex = -1
                let node = this.dictionary[index][0]
                for(let i = 0; i < node.length; i++)
                {
-                    if(this.distances[node[i]] < minWeight){
+                    console.log("this is node[i]: " + node[i])
+                    console.log("this is node[i]'s weight" + this.distances[node[i]])
+                    if(this.distances[node[i]] < minWeight && this.visited[node[i]] === false){
                          minWeight = this.distances[node[i]]
                          minWeightIndex = node[i]
                     }
                }
                this.shortestPathBack.push(minWeightIndex)
+               this.visited[minWeightIndex] = true
                index = minWeightIndex
           }
           this.shortestPathBack.push(this.start)
@@ -53,12 +60,14 @@
                for( const[key, value] of Object.entries(queue))
                {
                     let index = value[2]
-                    if(this.distances[index] < finalMinDistance)
+                    if(this.distances[index] < finalMinDistance && this.searchingVisited[index] === false)
                     {
+                         finalMinDistance = this.distances[index]
                          finalMinIndex = key //index of node with smallest value in distance array
                     }
                }
                let node = queue[finalMinIndex][0].slice() //pull out adjacent node array
+               this.searchingVisited[finalMinIndex] = true
                delete queue[finalMinIndex] //remove from queue
                for(let i = 0; i < node.length; i++) {
                     const totalDistance = this.distances[finalMinIndex] + this.weights[node[i]]
@@ -68,7 +77,7 @@
                     }
                }
           }
-          this.computeShortestPath()
+     console.log(this.distances)
      }
  }
 
