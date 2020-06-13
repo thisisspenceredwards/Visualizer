@@ -80,7 +80,7 @@ const Board = (props) => {
         const tick2 = (findPathArr, shortestPathArr) => {
             if(!finishedAnimatingFindPath) {
                 if (tickIndex < findPathArr.length) {
-                    //mutating the array directly :( doesn't seem to update promptly otherwise
+                    //mutating the array directly -- doesn't seem to update promptly otherwise
                     console.log("this is tickIndex: " + tickIndex)
                     console.log("this is findPathArr[tickIndex]: " + findPathArr[tickIndex])
                     squares[findPathArr[tickIndex]] = 'green'
