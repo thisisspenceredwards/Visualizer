@@ -50,6 +50,12 @@ const Board = (props) => {
                 }
                 squares[tickArr[tickArr.length - 1]] = 'gold'
                 setSquares(squares.slice())
+                return (
+                    addToast("Path does exist", {
+                        placement: 'top-middle',
+                        appearance: 'success',
+                        autoDismiss: true,
+                    }))
             }
         }
         timerID2 = setInterval(
@@ -216,7 +222,7 @@ const Board = (props) => {
         setSquares(squares)
         return (
             addToast(toastMessage, {
-                appearance: 'success',
+                appearance: 'info',
                 autoDismiss: true,
             }))
     }
@@ -304,22 +310,17 @@ const Board = (props) => {
                             Algorithms
                         </button>
                         <div className={menuClass} aria-labelledby="btnGroupDrop1">
-                            <Button className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Depth First Search
                                 <p> (Does path Exist)</p>
-                          </Button>
-                            <Button className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                          </a>
+                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Breath-First Search
                                 <p>(Shortest Path)</p>
-                            </Button>
-                            <Button className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
-                                Breath-First Search
-                                <p>(Least Cost Path)</p>
-                                <p> Not Yet Implemented</p>
-                            </Button>
-                            <Button className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            </a>
+                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Dijkstra's SPF
-                            </Button>
+                            </a>
                         </div>
                     </div>
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
@@ -367,3 +368,12 @@ export default Board
 }
 OnMount()*/
 //OnUpdate(startMarkerIndex)
+
+
+/*
+<Button id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Breath-First Search
+                                <p>(Least Cost Path)</p>
+                                <p> Not Yet Implemented</p>
+                            </Button>
+ */
