@@ -65,22 +65,24 @@
   width : 20%;
 }
 .btn-group-vertical{
-  margin: -5%;
-  width: 100%;
+  width: 70%;
 }
-#mainButton{
-  height: 100%;
+#controlButton{
+
 }
 a:hover {
   width: 100%;
   background-color: grey;
   text-align: center;
 }
-.btn.btn-primary {
-  margin: 5%;
-  padding: 15%;
-  height: 100%;
-  width: 100%;
+/*.controlButton {
+  float: right;
+
+
+}*/
+.btn {
+
+  padding: 0;
 }
 
 /*.square:focus{
