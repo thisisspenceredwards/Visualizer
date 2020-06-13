@@ -1,54 +1,5 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-
-/*
-const Square = (props) => {
-
-    const[hover, setHover] = useState(false)
-    const[id, setId] = useState('')
-
-    const onMouseEnterSquare = () => {
-        setHover(true)
-        setId('redBackground')
-    }
-
-    const onMouseLeaveSquare = () => {
-        setHover(false)
-        setId('blueBackground')
-    }
-
-    const onClick = () => {
-        console.log("called")
-        props.onClick()
-    }
-    shouldComponentUpdate(nextProps, nextState, nextContext)
-    {
-        if(nextState.id !== this.state.id)
-            return true
-        else return nextProps.id !== this.props.id;
-    }
-    let stateId
-    if(!hover)
-        stateId = id
-    else
-        stateId = id
-    console.log("This is state.id " + stateId)
-        return (
-            <Button
-                variant="secondary"
-                className="square"
-                id={stateId}
-                onMouseEnter={onMouseEnterSquare.bind()}
-                onMouseLeave={onMouseLeaveSquare.bind()}
-                onClick={onClick.bind()}>
-            </Button>
-        )
-}
-export default Square
-
-
-*/
-
 class Square extends React.Component {
     constructor(props) {
         super(props)
@@ -60,7 +11,6 @@ class Square extends React.Component {
         this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
         this.onMouseLeaveSquare = this.onMouseLeaveSquare.bind(this)
         this.onClick = this.onClick.bind(this)
-        this.setWeight = this.setWeight.bind(this)
     }
 
     onMouseEnterSquare() {
@@ -75,13 +25,6 @@ class Square extends React.Component {
             id: 'blueBackground',
             hover: false
         })
-    }
-    setWeight(){
-        console.log("set Weight: " + this.props.id)
-        if(this.props.id !== 'startMarker' && this.props.id !== 'endMarker')
-        {
-            this.props.setWeight()
-        }
     }
     onClick() {
         this.props.onClick()
