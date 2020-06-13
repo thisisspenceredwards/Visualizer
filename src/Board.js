@@ -304,22 +304,22 @@ const Board = (props) => {
                             Algorithms
                         </button>
                         <div className={menuClass} aria-labelledby="btnGroupDrop1">
-                            <a className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <Button className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Depth First Search
                                 <p> (Does path Exist)</p>
-                          </a>
-                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                          </Button>
+                            <Button className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Breath-First Search
                                 <p>(Shortest Path)</p>
-                            </a>
-                            <a className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            </Button>
+                            <Button className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Breath-First Search
                                 <p>(Least Cost Path)</p>
                                 <p> Not Yet Implemented</p>
-                            </a>
-                            <a className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            </Button>
+                            <Button className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Dijkstra's SPF
-                            </a>
+                            </Button>
                         </div>
                     </div>
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
