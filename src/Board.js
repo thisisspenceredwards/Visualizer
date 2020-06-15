@@ -1,8 +1,10 @@
 import React, {useState} from "react";
+import MyCard from "./CustomCard"
 import {useToasts} from "react-toast-notifications";
 import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
+import Toggle from "./ToggleSwitch"
 import createContainer from "./CreateContainer"
 import BreathFirstSearch from "./BreathFirstSearch"
 import Dijkstra from "./Dijkstra"
@@ -10,6 +12,12 @@ import Dijkstra from "./Dijkstra"
 
 const Board = (props) => {
     //can likely optimize blockedNodes
+    const [show, setShow] = useState(false);
+    const [cardMessages, setCardMessages] = useState(Array("Initial Item", "item two"))
+    const [backendOrFrontEnd, setBackEndOrFrontEnd] = useState(Array("Backend Response: ", "FrontEnd Response:"))
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const [backendToggle, setBackendToggle] = useState(false)
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
     let [weights, setWeights] = useState(Array(props.height * props.width).fill(1))
@@ -285,6 +293,24 @@ const Board = (props) => {
 
     }
 
+
+    const dummyTurnOnBackend = () =>
+    {
+        console.log("turn on backend")
+    }
+    const dummyTurnOffBackend = () =>
+    {
+        console.log("turn off backend")
+    }
+    const clearCardMessages = () =>
+    {
+        setCardMessages([])
+        setBackEndOrFrontEnd([])
+    }
+
+
+
+
     let parent = []
     let count = 0
     const HEIGHT = props.height
@@ -298,12 +324,15 @@ const Board = (props) => {
         }
         parent.push(<div key={i} className={"board-row"}>{children}</div>)
     }
+    const toggle = () => {
+        setBackendToggle(!backendToggle)
+    }
     const toggleOpen = () => setDropDownMenu(!dropDownMenu)
     const menuClass = `dropdown-menu ${ dropDownMenu? " show": ""}`
     return (
         <div id={"box"}>
-            <div id={"rightBox"}>
-                <div id = "buttons" className = "btn-group-vertical" role={"group"}>
+            <div id={"leftBox"}>
+                    <div id = "buttons" className = "btn-group-vertical" role={"group"}>
                     <div className="btn-group" role="group">
                         <button id="btnGroupDrop1" type="button"  onClick = {toggleOpen.bind(this)} className="btn btn-primary dropdown-toggle"
                                 data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
@@ -326,11 +355,17 @@ const Board = (props) => {
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-                </div>
+                        <Toggle title = "Enable Backend" functionOn = {dummyTurnOnBackend.bind(this)} functionOff ={ dummyTurnOffBackend.bind(this)}/>
+
+                    </div>
             </div>
-        <div id={"leftBox"}>
+        <div id={"centerBox"}>
          {parent}
         </div>
+            <div id={"rightBox"}>
+                  <MyCard clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
+            </div>
+
 
 
         </div>
