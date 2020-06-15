@@ -2,9 +2,13 @@ https://thisisspenceredwards.github.io/Visualizer/
 6/15
 <br>
 Possible other features to implement for front end
+<br>
 dragable start and end locations
+<br>
 drag to add barriers as opposed to clicking each one
+<br>
 upon moving a start or end redraw the shortest path
+<br>
 
 6/10
 <br>
