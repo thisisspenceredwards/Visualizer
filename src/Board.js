@@ -150,7 +150,7 @@ const Board = (props) => {
                     //mutating the array directly -- doesn't seem to update promptly otherwise
                     //console.log("this is tickIndex: " + tickIndex)
                     //console.log("this is findPathArr[tickIndex]: " + findPathArr[tickIndex])
-                    if(!(findPathArr[tickIndex] === endMarkerIndex))
+                    if(!(findPathArr[tickIndex] === endMarkerIndex) && !(findPathArr[tickIndex] === startMarkerIndex))
                         squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
                     setSquares(squares.slice())
