@@ -4,20 +4,16 @@ import {useToasts} from "react-toast-notifications";
 import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
-import Toggle from "./ToggleSwitch"
 import createContainer from "./CreateContainer"
 import BreathFirstSearch from "./BreathFirstSearch"
 import Dijkstra from "./Dijkstra"
+import axios from "axios"
 
 
 const Board = (props) => {
     //can likely optimize blockedNodes
-    const [show, setShow] = useState(false);
-    const [cardMessages, setCardMessages] = useState(Array("Initial Item", "item two"))
-    const [backendOrFrontEnd, setBackEndOrFrontEnd] = useState(Array("Backend Response: ", "FrontEnd Response:"))
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const [backendToggle, setBackendToggle] = useState(false)
+    let [cardMessages, setCardMessages] = useState([])
+    let [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
     let [weights, setWeights] = useState(Array(props.height * props.width).fill(1))
@@ -28,6 +24,68 @@ const Board = (props) => {
     const [barrier, setBarrier] = useState(false)
     const {addToast} = useToasts()
     const [weightButton, setWeightButton] = useState(false)
+
+    const updateMessages = (data, sender) =>
+    {
+        cardMessages.unshift(data)
+        backendOrFrontEnd.unshift(sender)
+        setCardMessages(cardMessages)
+        setBackEndOrFrontEnd(backendOrFrontEnd)
+    }
+    const backendDepthFirstSearch = async () =>
+    {
+        const valid =checkForValidMarkers()
+        if(valid!== null) {
+            return valid
+        }
+        setClicked(true)
+        updateMessages('Sending data for DFS', 'frontend')
+        await axios.post('https://visualizerbackend.herokuapp.com/depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
+            .then(res=>{
+                updateMessages(res.data[0], 'backend')
+                animateWithoutReturnPath(res.data[1])
+            })
+            .catch(err => {console.error(err)})
+    }
+    let backendBreathFirstSearch = async () => {
+        const valid =checkForValidMarkers()
+        if(valid!== null)
+        {
+            return valid
+        }
+        setClicked(true)
+        updateMessages('Sending data for BFS', 'frontend')
+        await axios.post('https://visualizerbackend.herokuapp.com/breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+            .then(res=>{
+                updateMessages(res.data[0], 'backend')
+                animateWithReturnPath(res.data[1])
+            })
+            .catch(err => {console.error(err)})
+        //const k = new BreathFirstSearch()
+        //let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        //let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
+        //animateWithReturnPath(shortestPath)
+    }
+    let backendDijkstra = async () =>
+    {
+        const valid = checkForValidMarkers()
+        if(valid !== null)
+        {
+            return valid
+        }
+        setClicked(true)
+        updateMessages('Sending data for Dijkstra', 'frontend')
+        await axios.post('https://visualizerbackend.herokuapp.com/dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
+            .then(res=>{
+                updateMessages(res.data[0], 'backend')
+                animateWithReturnPath(res.data[1])
+            })
+            .catch(err => {console.error(err)})
+        //let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        //const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
+        //let shortestPath = k.dijkstra()
+        //animateWithReturnPath(shortestPath)
+    }
 
     let animateWithoutReturnPath = (arr) => {
         clearSquares()
@@ -72,11 +130,6 @@ const Board = (props) => {
         )
     }
 
-    const setWeight = (count) => {
-            weights[count] = weights[count]+1
-            setWeights(weights.slice())
-    }
-
     let animateWithReturnPath = (arr) => {
         const findPathArr = arr[0]
         const shortestPathArr = arr[1]
@@ -95,9 +148,10 @@ const Board = (props) => {
             if(!finishedAnimatingFindPath) {
                 if (tickIndex < findPathArr.length) {
                     //mutating the array directly -- doesn't seem to update promptly otherwise
-                    console.log("this is tickIndex: " + tickIndex)
-                    console.log("this is findPathArr[tickIndex]: " + findPathArr[tickIndex])
-                    squares[findPathArr[tickIndex]] = 'green'
+                    //console.log("this is tickIndex: " + tickIndex)
+                    //console.log("this is findPathArr[tickIndex]: " + findPathArr[tickIndex])
+                    if(!(findPathArr[tickIndex] === endMarkerIndex))
+                        squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
                     setSquares(squares.slice())
                 } else {
@@ -129,6 +183,11 @@ const Board = (props) => {
         )
     }
 
+    const setWeight = (count) => {
+        weights[count] = weights[count]+1
+        setWeights(weights.slice())
+    }
+
     const checkForValidMarkers = () => {
         if (startMarkerIndex < 0 && endMarkerIndex < 0) {
             return (
@@ -138,7 +197,7 @@ const Board = (props) => {
                 }))
         } else return null
     }
-    let dijkstras = () =>
+    let dijkstra = () =>
     {
         const valid = checkForValidMarkers()
         if(valid !== null)
@@ -292,16 +351,6 @@ const Board = (props) => {
             document.getElementById("addWeights").innerText = "Toggle Weights Off"
 
     }
-
-
-    const dummyTurnOnBackend = () =>
-    {
-        console.log("turn on backend")
-    }
-    const dummyTurnOffBackend = () =>
-    {
-        console.log("turn off backend")
-    }
     const clearCardMessages = () =>
     {
         setCardMessages([])
@@ -324,9 +373,6 @@ const Board = (props) => {
         }
         parent.push(<div key={i} className={"board-row"}>{children}</div>)
     }
-    const toggle = () => {
-        setBackendToggle(!backendToggle)
-    }
     const toggleOpen = () => setDropDownMenu(!dropDownMenu)
     const menuClass = `dropdown-menu ${ dropDownMenu? " show": ""}`
     return (
@@ -347,7 +393,7 @@ const Board = (props) => {
                                 Breath-First Search
                                 <p>(Shortest Path)</p>
                             </a>
-                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {dijkstras.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {dijkstra.bind(this, SIZE, WIDTH, HEIGHT)} >
                                 Dijkstra's SPF
                             </a>
                         </div>
@@ -355,8 +401,9 @@ const Board = (props) => {
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-                        <Toggle title = "Enable Backend" functionOn = {dummyTurnOnBackend.bind(this)} functionOff ={ dummyTurnOffBackend.bind(this)}/>
-
+                        <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS</Button>
+                        <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
+                        <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
                     </div>
             </div>
         <div id={"centerBox"}>
@@ -375,40 +422,3 @@ const Board = (props) => {
 export default Board
 
 
-/* const OnUpdate = (startMarkerIndex) =>
- {
-     useEffect(() =>
-     {
-         let hell  = parent[1]
-         console.log(hell)
-     })
- }*/
-
-
-/*const OnMount = () => {
-    useEffect(() => {
-        let parent = []
-        let count = 0
-        for (let i = 0; i < HEIGHT; i++) {
-            let children = []
-            for (let j = 0; j < WIDTH; j++) {
-                children.push(renderSquare(count))
-                count++
-            }
-            parent.push(<div key={i} className={"board-row"}>{children}</div>)
-        }
-        setParent(parent)
-    }, [])
-
-}
-OnMount()*/
-//OnUpdate(startMarkerIndex)
-
-
-/*
-<Button id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
-                                Breath-First Search
-                                <p>(Least Cost Path)</p>
-                                <p> Not Yet Implemented</p>
-                            </Button>
- */
