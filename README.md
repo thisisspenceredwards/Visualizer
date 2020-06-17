@@ -1,5 +1,16 @@
 https://thisisspenceredwards.github.io/Visualizer/
 <br>
+https://visualizerbackend.herokuapp.com
+<br>
+6/17
+<br>
+Added backend, hosted it on heroku, messaging between the two work well!
+<br>
+now polish front end.  Maybe add a front end to the backend server so people can see it receiving messages(?)
+<br>
+Make it mobile friendly?
+
+<br>
 6/15
 <br>
 Possible other features to implement for front end
