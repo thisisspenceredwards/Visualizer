@@ -357,9 +357,6 @@ const Board = (props) => {
         setBackEndOrFrontEnd([])
     }
 
-
-
-
     let parent = []
     let count = 0
     const HEIGHT = props.height
@@ -378,7 +375,7 @@ const Board = (props) => {
     return (
         <div id={"box"}>
             <div id={"leftBox"}>
-                    <div id = "buttons" className = "btn-group-vertical" role={"group"}>
+                    <div id = "buttons1" className = "btn-group-vertical" role={"group"}>
                     <div className="btn-group" role="group">
                         <button id="btnGroupDrop1" type="button"  onClick = {toggleOpen.bind(this)} className="btn btn-primary dropdown-toggle"
                                 data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
@@ -401,10 +398,14 @@ const Board = (props) => {
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-                        <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS</Button>
-                        <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
-                        <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
+
                     </div>
+                <div id = "buttons2" className = "btn-group-vertical" role={"group"}>
+
+                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS</Button>
+                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
+                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
+                </div>
             </div>
         <div id={"centerBox"}>
          {parent}

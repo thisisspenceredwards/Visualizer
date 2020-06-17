@@ -83,7 +83,12 @@ a:hover {
 .btn {
   padding: 0;
 }
-
+#buttons1{
+  padding: 2vh;
+}
+#buttons2{
+  padding: 2vh;
+}
 /*.square:focus{
   outline: none;
   box-shadow: none;
