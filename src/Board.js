@@ -24,8 +24,6 @@ const Board = (props) => {
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [dropDownMenu, setDropDownMenu] = useState(false)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
-    let clicked = false
-   // let [clicked, setClicked] = useState(false)
     const [barrier, setBarrier] = useState(false)
     const {addToast} = useToasts()
     const [weightButton, setWeightButton] = useState(false)
@@ -53,10 +51,6 @@ const Board = (props) => {
         {
             return valid
         }
-        if (clicked === true) {
-            return
-        }
-        clicked = true
         messageSeparator()
         updateMessages('Sending data for Dijkstra', 'Frontend')
         await axios.post(testingUrl + 'dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
@@ -64,8 +58,14 @@ const Board = (props) => {
                 dialogToOutput(date1, res.data[0])
                 if(!res.data[1] === false) {
                     animateWithReturnPath(res.data[1])
-                    clicked = false
                 }
+                else
+                    return (
+                        addToast("Path does not exist", {
+                            placement: 'top-middle',
+                            appearance: 'warning',
+                            autoDismiss: true,
+                        }))
             })
             .catch(err => {console.error(err)})
         //let dict = createContainer(SIZE, WIDTH, blockedNodes)
@@ -80,10 +80,6 @@ const Board = (props) => {
         if(valid!== null) {
             return valid
         }
-        if (clicked === true) { //another algorithm has been run
-            return
-        }
-        clicked = true
         messageSeparator()
         updateMessages('Sending data for DFS', 'Frontend')
         await axios.post(testingUrl + 'depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
@@ -98,16 +94,13 @@ const Board = (props) => {
         updateMessages(" ", " *************************  ")
     }
     let backendBreathFirstSearch = async () => {
-        if (clicked === true) {
-            return
-        }
         let date1 = new Date()
         const valid =checkForValidMarkers()
         if(valid!== null)
         {
             return valid
         }
-        clicked = true
+
         messageSeparator()
         updateMessages('Sending data for BFS', 'Frontend')
         await axios.post(testingUrl + 'breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
@@ -116,8 +109,14 @@ const Board = (props) => {
                 dialogToOutput(date1, res.data[0])
                 if(!res.data[1] === false) {
                     animateWithReturnPath(res.data[1])
-                    clicked = false
                 }
+                else
+                    return (
+                        addToast("Path does not exist", {
+                            placement: 'top-middle',
+                            appearance: 'warning',
+                            autoDismiss: true,
+                        }))
             })
             .catch(err => {console.error(err)})
     }
@@ -140,7 +139,6 @@ const Board = (props) => {
                 setSquares(squares.slice())
             } else {
                 clearTickInterval(timerID2)
-                clicked = false
                 if(tickArr[tickArr.length - 1] === false) {
                     return (
                         addToast("Path does not exist", {
@@ -165,15 +163,12 @@ const Board = (props) => {
     }
 
     let animateWithReturnPath = (arr) => {
-
-        if (clicked === true) {
-            return
-        }
         const findPathArr = arr[0]
         const shortestPathArr = arr[1]
         let tickIndex = 0
         let timerID2
-
+        clearSquares()
+        reDrawBarrier()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -205,7 +200,6 @@ const Board = (props) => {
                     squares[shortestPathArr[shortestPathArr.length - 1]] = 'gold'
                     setSquares(squares.slice())
                     clearTickInterval(timerID2)
-                    clicked = false
                 }
             }
         }
