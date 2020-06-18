@@ -12,7 +12,13 @@ import axios from "axios"
 
 const Board = (props) => {
     //can likely optimize blockedNodes
-    let [cardMessages, setCardMessages] = useState([])
+    let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take several seconds to complete.",
+                                                            "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
+                                                            "To use:  Click a square to set a start location",
+                                                                "Then click another square to select a destination",
+                                                                    "You may also set barriers to change the available paths",
+                                                                        "Additionally, for Dijkstra's SPF you can set the weight of each square " +
+                                                                        "changing the algorithm's chosen path"])
     let [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
@@ -32,32 +38,47 @@ const Board = (props) => {
         setCardMessages(cardMessages)
         setBackEndOrFrontEnd(backendOrFrontEnd)
     }
+    const dialogToOutput = (date1, data) =>
+    {
+        const date2 = new Date()
+        const time = Math.abs(date2-date1)/1000
+        updateMessages(data, 'Backend'  )
+        updateMessages('Query round trip time: ' +  time + " seconds", 'Frontend')
+    }
     const backendDepthFirstSearch = async () =>
     {
+        const date1 = new Date()
         const valid =checkForValidMarkers()
         if(valid!== null) {
             return valid
         }
         setClicked(true)
-        updateMessages('Sending data for DFS', 'frontend')
+        messageSeparator()
+        updateMessages('Sending data for DFS', 'Frontend')
         await axios.post('https://visualizerbackend.herokuapp.com/depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
             .then(res=>{
-                updateMessages(res.data[0], 'backend')
+                dialogToOutput(date1, res.data[0])
                 animateWithoutReturnPath(res.data[1])
             })
             .catch(err => {console.error(err)})
     }
+    const messageSeparator = () =>
+    {
+        updateMessages(" ", " *************************  ")
+    }
     let backendBreathFirstSearch = async () => {
+        let date1 = new Date()
         const valid =checkForValidMarkers()
         if(valid!== null)
         {
             return valid
         }
         setClicked(true)
-        updateMessages('Sending data for BFS', 'frontend')
+        messageSeparator()
+        updateMessages('Sending data for BFS', 'Frontend')
         await axios.post('https://visualizerbackend.herokuapp.com/breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
-                updateMessages(res.data[0], 'backend')
+                dialogToOutput(date1, res.data[0])
                 animateWithReturnPath(res.data[1])
             })
             .catch(err => {console.error(err)})
@@ -68,16 +89,18 @@ const Board = (props) => {
     }
     let backendDijkstra = async () =>
     {
+        const date1 = new Date()
         const valid = checkForValidMarkers()
         if(valid !== null)
         {
             return valid
         }
         setClicked(true)
-        updateMessages('Sending data for Dijkstra', 'frontend')
+        messageSeparator()
+        updateMessages('Sending data for Dijkstra', 'Frontend')
         await axios.post('https://visualizerbackend.herokuapp.com/dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
             .then(res=>{
-                updateMessages(res.data[0], 'backend')
+                dialogToOutput(date1, res.data[0])
                 animateWithReturnPath(res.data[1])
             })
             .catch(err => {console.error(err)})
@@ -382,15 +405,15 @@ const Board = (props) => {
                             Algorithms
                         </button>
                         <div className={menuClass} aria-labelledby="btnGroupDrop1">
-                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS>
                                 Depth First Search
                                 <p> (Does path Exist)</p>
                           </a>
-                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendBreathFirstSearch.bind(this) }>
                                 Breath-First Search
                                 <p>(Shortest Path)</p>
                             </a>
-                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {dijkstra.bind(this, SIZE, WIDTH, HEIGHT)} >
+                            <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDijkstra.bind(this) }>
                                 Dijkstra's SPF
                             </a>
                         </div>
@@ -398,14 +421,8 @@ const Board = (props) => {
                     <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-
                     </div>
-                <div id = "buttons2" className = "btn-group-vertical" role={"group"}>
 
-                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS</Button>
-                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
-                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
-                </div>
             </div>
         <div id={"centerBox"}>
          {parent}
@@ -423,3 +440,28 @@ const Board = (props) => {
 export default Board
 
 
+/*
+  <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Depth First Search
+                                <p> (Does path Exist)</p>
+                          </a>
+                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Breath-First Search
+                                <p>(Shortest Path)</p>
+                            </a>
+                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {dijkstra.bind(this, SIZE, WIDTH, HEIGHT)} >
+                                Dijkstra's SPF
+                            </a>
+
+
+
+  <div id = "buttons2" className = "btn-group-vertical" role={"group"}>
+
+                         </div>
+
+
+                              <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS</Button>
+                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
+                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
+
+ */
