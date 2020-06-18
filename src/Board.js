@@ -45,6 +45,28 @@ const Board = (props) => {
         updateMessages(data, 'Backend'  )
         updateMessages('Query round trip time: ' +  time + " seconds", 'Frontend')
     }
+    let backendDijkstra = async () =>
+    {
+        const date1 = new Date()
+        const valid = checkForValidMarkers()
+        if(valid !== null)
+        {
+            return valid
+        }
+        setClicked(true)
+        messageSeparator()
+        updateMessages('Sending data for Dijkstra', 'Frontend')
+        await axios.post('https://visualizerbackend.herokuapp.com/dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
+            .then(res=>{
+                dialogToOutput(date1, res.data[0])
+                animateWithReturnPath(res.data[1])
+            })
+            .catch(err => {console.error(err)})
+        //let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        //const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
+        //let shortestPath = k.dijkstra()
+        //animateWithReturnPath(shortestPath)
+    }
     const backendDepthFirstSearch = async () =>
     {
         const date1 = new Date()
@@ -82,32 +104,6 @@ const Board = (props) => {
                 animateWithReturnPath(res.data[1])
             })
             .catch(err => {console.error(err)})
-        //const k = new BreathFirstSearch()
-        //let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        //let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        //animateWithReturnPath(shortestPath)
-    }
-    let backendDijkstra = async () =>
-    {
-        const date1 = new Date()
-        const valid = checkForValidMarkers()
-        if(valid !== null)
-        {
-            return valid
-        }
-        setClicked(true)
-        messageSeparator()
-        updateMessages('Sending data for Dijkstra', 'Frontend')
-        await axios.post('https://visualizerbackend.herokuapp.com/dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
-            .then(res=>{
-                dialogToOutput(date1, res.data[0])
-                animateWithReturnPath(res.data[1])
-            })
-            .catch(err => {console.error(err)})
-        //let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        //const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
-        //let shortestPath = k.dijkstra()
-        //animateWithReturnPath(shortestPath)
     }
 
     let animateWithoutReturnPath = (arr) => {
@@ -220,43 +216,7 @@ const Board = (props) => {
                 }))
         } else return null
     }
-    let dijkstra = () =>
-    {
-        const valid = checkForValidMarkers()
-        if(valid !== null)
-        {
-            return valid
-        }
-        setClicked(true)
 
-        let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
-        let shortestPath = k.dijkstra()
-        animateWithReturnPath(shortestPath)
-    }
-    let breathFirstSearch = () => {
-        const valid =checkForValidMarkers()
-        if(valid!== null)
-        {
-            return valid
-        }
-        setClicked(true)
-        const k = new BreathFirstSearch()
-        let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        animateWithReturnPath(shortestPath)
-    }
-    let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
-        const valid =checkForValidMarkers()
-        if(valid!== null) {
-            return valid
-        }
-        setClicked(true)
-        const k = new DepthFirstSearch()
-        let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        animateWithoutReturnPath(shortestPath)
-    }
     let renderSquare = (count) => {
         let state = 'slateGrey'
         if (squares[count] === 'gold' || squares[count] === 'green' || squares[count] === 'black')
@@ -464,4 +424,45 @@ export default Board
                 <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
                 <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
 
+ */
+
+/*
+
+       let breathFirstSearch = () => {
+        const valid =checkForValidMarkers()
+        if(valid!== null)
+        {
+            return valid
+        }
+        setClicked(true)
+        const k = new BreathFirstSearch()
+        let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
+        animateWithReturnPath(shortestPath)
+    }
+    let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
+        const valid =checkForValidMarkers()
+        if(valid!== null) {
+            return valid
+        }
+        setClicked(true)
+        const k = new DepthFirstSearch()
+        let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
+        animateWithoutReturnPath(shortestPath)
+    }
+     let dijkstra = () =>
+    {
+        const valid = checkForValidMarkers()
+        if(valid !== null)
+        {
+            return valid
+        }
+        setClicked(true)
+
+        let dict = createContainer(SIZE, WIDTH, blockedNodes)
+        const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
+        let shortestPath = k.dijkstra()
+        animateWithReturnPath(shortestPath)
+    }
  */
