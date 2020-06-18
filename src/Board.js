@@ -39,9 +39,9 @@ const Board = (props) => {
     const dialogToOutput = (date1, data) =>
     {
         const date2 = new Date()
-        const time = Math.abs(date2-date1)/1000
+        const time = Math.abs(date2-date1)
         updateMessages(data, 'Backend'  )
-        updateMessages('Query round trip time: ' +  time + " seconds", 'Frontend')
+        updateMessages('Query round trip time: ' +  time + " milliseconds", 'Frontend')
     }
     let backendDijkstra = async () =>
     {
@@ -62,16 +62,11 @@ const Board = (props) => {
                 else
                     return (
                         addToast("Path does not exist", {
-                            placement: 'top-middle',
                             appearance: 'warning',
                             autoDismiss: true,
                         }))
             })
             .catch(err => {console.error(err)})
-        //let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        //const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
-        //let shortestPath = k.dijkstra()
-        //animateWithReturnPath(shortestPath)
     }
     const backendDepthFirstSearch = async () =>
     {
@@ -100,12 +95,10 @@ const Board = (props) => {
         {
             return valid
         }
-
         messageSeparator()
         updateMessages('Sending data for BFS', 'Frontend')
         await axios.post(testingUrl + 'breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
-                console.log("await.axios")
                 dialogToOutput(date1, res.data[0])
                 if(!res.data[1] === false) {
                     animateWithReturnPath(res.data[1])
@@ -113,7 +106,6 @@ const Board = (props) => {
                 else
                     return (
                         addToast("Path does not exist", {
-                            placement: 'top-middle',
                             appearance: 'warning',
                             autoDismiss: true,
                         }))
@@ -150,7 +142,6 @@ const Board = (props) => {
                 setSquares(squares.slice())
                 return (
                     addToast("Path does exist", {
-                        placement: 'top-middle',
                         appearance: 'success',
                         autoDismiss: true,
                     }))
@@ -385,9 +376,9 @@ const Board = (props) => {
                             </a>
                         </div>
                     </div>
-                    <Button className = "btn btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
-                    <Button className = "btn btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
-                    <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
                     </div>
 
             </div>
