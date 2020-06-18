@@ -1,18 +1,15 @@
 import React, {useState} from "react";
 import MyCard from "./CustomCard"
 import {useToasts} from "react-toast-notifications";
-import DepthFirstSearch from "./DepthFirstSearch";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
-import createContainer from "./CreateContainer"
-import BreathFirstSearch from "./BreathFirstSearch"
-import Dijkstra from "./Dijkstra"
 import axios from "axios"
 
 
 const Board = (props) => {
+    const url = "https://visualizerbackend.herokuapp.com/"
     //can likely optimize blockedNodes
-    let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take several seconds to complete.",
+    let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
                                                             "To use:  Click a square to set a start location",
                                                                 "Then click another square to select a destination",
@@ -56,7 +53,7 @@ const Board = (props) => {
         setClicked(true)
         messageSeparator()
         updateMessages('Sending data for Dijkstra', 'Frontend')
-        await axios.post('https://visualizerbackend.herokuapp.com/dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
+        await axios.post(url + 'dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
             .then(res=>{
                 dialogToOutput(date1, res.data[0])
                 animateWithReturnPath(res.data[1])
@@ -77,7 +74,7 @@ const Board = (props) => {
         setClicked(true)
         messageSeparator()
         updateMessages('Sending data for DFS', 'Frontend')
-        await axios.post('https://visualizerbackend.herokuapp.com/depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
+        await axios.post(url + 'depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
             .then(res=>{
                 dialogToOutput(date1, res.data[0])
                 animateWithoutReturnPath(res.data[1])
@@ -98,7 +95,7 @@ const Board = (props) => {
         setClicked(true)
         messageSeparator()
         updateMessages('Sending data for BFS', 'Frontend')
-        await axios.post('https://visualizerbackend.herokuapp.com/breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+        await axios.post(url + 'breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
                 dialogToOutput(date1, res.data[0])
                 animateWithReturnPath(res.data[1])
@@ -167,8 +164,6 @@ const Board = (props) => {
             if(!finishedAnimatingFindPath) {
                 if (tickIndex < findPathArr.length) {
                     //mutating the array directly -- doesn't seem to update promptly otherwise
-                    //console.log("this is tickIndex: " + tickIndex)
-                    //console.log("this is findPathArr[tickIndex]: " + findPathArr[tickIndex])
                     if(!(findPathArr[tickIndex] === endMarkerIndex) && !(findPathArr[tickIndex] === startMarkerIndex))
                         squares[findPathArr[tickIndex]] = 'green'
                     tickIndex++
@@ -400,69 +395,3 @@ const Board = (props) => {
 export default Board
 
 
-/*
-  <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {depthFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
-                                Depth First Search
-                                <p> (Does path Exist)</p>
-                          </a>
-                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {breathFirstSearch.bind(this, SIZE, WIDTH, HEIGHT)} >
-                                Breath-First Search
-                                <p>(Shortest Path)</p>
-                            </a>
-                            <a id={"menuButton"} className = "btn btn-primary-dropdown-item" onClick = {dijkstra.bind(this, SIZE, WIDTH, HEIGHT)} >
-                                Dijkstra's SPF
-                            </a>
-
-
-
-  <div id = "buttons2" className = "btn-group-vertical" role={"group"}>
-
-                         </div>
-
-
-                              <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS</Button>
-                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendBreathFirstSearch.bind(this) }>Backend BFS</Button>
-                <Button className = "btn btn-primary-controlButton" id ="addWeights" onClick = { backendDijkstra.bind(this) }>Backend Dijkstra</Button>
-
- */
-
-/*
-
-       let breathFirstSearch = () => {
-        const valid =checkForValidMarkers()
-        if(valid!== null)
-        {
-            return valid
-        }
-        setClicked(true)
-        const k = new BreathFirstSearch()
-        let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        let shortestPath = k.BFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        animateWithReturnPath(shortestPath)
-    }
-    let depthFirstSearch = (SIZE, HEIGHT, WIDTH) => {
-        const valid =checkForValidMarkers()
-        if(valid!== null) {
-            return valid
-        }
-        setClicked(true)
-        const k = new DepthFirstSearch()
-        let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        let shortestPath = k.DFS(startMarkerIndex, endMarkerIndex, dict, SIZE)
-        animateWithoutReturnPath(shortestPath)
-    }
-     let dijkstra = () =>
-    {
-        const valid = checkForValidMarkers()
-        if(valid !== null)
-        {
-            return valid
-        }
-        setClicked(true)
-
-        let dict = createContainer(SIZE, WIDTH, blockedNodes)
-        const k = new Dijkstra(weights, dict, startMarkerIndex, endMarkerIndex, SIZE)
-        let shortestPath = k.dijkstra()
-        animateWithReturnPath(shortestPath)
-    }
- */
