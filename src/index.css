@@ -53,6 +53,10 @@
   height:100vh;
   overflow: scroll;
 }
+.sweet-loading{
+ display: inline-block;
+
+}
 #headerButton{
   float:left;
 }

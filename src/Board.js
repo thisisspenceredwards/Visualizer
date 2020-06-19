@@ -17,6 +17,7 @@ const Board = (props) => {
                                                                     "You may also set barriers to change the available paths",
                                                                         "Additionally, for Dijkstra's SPF you can set the weight of each square " +
                                                                         "changing the algorithm's chosen path"])
+    const [loading, setLoading] = useState(false)
     let [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
     let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
@@ -38,6 +39,7 @@ const Board = (props) => {
     }
     const dialogToOutput = (date1, data) =>
     {
+        setLoading(false)
         const date2 = new Date()
         const time = Math.abs(date2-date1)
         updateMessages(data, 'Backend'  )
@@ -51,6 +53,7 @@ const Board = (props) => {
         {
             return valid
         }
+        setLoading(true)
         messageSeparator()
         updateMessages('Sending data for Dijkstra', 'Frontend')
         await axios.post(testingUrl + 'dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
@@ -75,6 +78,7 @@ const Board = (props) => {
         if(valid!== null) {
             return valid
         }
+        setLoading(true)
         messageSeparator()
         updateMessages('Sending data for DFS', 'Frontend')
         await axios.post(testingUrl + 'depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
@@ -95,6 +99,7 @@ const Board = (props) => {
         {
             return valid
         }
+        setLoading(true)
         messageSeparator()
         updateMessages('Sending data for BFS', 'Frontend')
         await axios.post(testingUrl + 'breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
@@ -386,7 +391,7 @@ const Board = (props) => {
          {parent}
         </div>
             <div id={"rightBox"}>
-                  <MyCard clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
+                  <MyCard loading = {loading} clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
             </div>
 
 

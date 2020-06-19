@@ -1,6 +1,7 @@
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import React from "react";
+import RingLoader from "react-spinners/RingLoader"
 
 const MyCard = (props) =>
 {
@@ -10,13 +11,23 @@ const MyCard = (props) =>
         holder.push( <Card.Title key = {"Title" + i} >{props.header[i]}</Card.Title>)
         holder.push(  <Card.Text key = {"Message" + i}>{props.messages[i]}</Card.Text>)
     }
+    let loader
+    if(props.loading)
+    {
+        loader =  <div className = "sweet-loading">
+            <RingLoader
+            />
+        </div>
+    }
     return (
     <Card className="text-center">
         <Card.Header>
             <Button id={"headerButton"} onClick = {props.clearMessages.bind(this)}>Clear Messages</Button>
             Messages Sent and Received
+
         </Card.Header>
         <Card.Body>
+            {loader}
             {holder}
         </Card.Body>
     </Card>)
