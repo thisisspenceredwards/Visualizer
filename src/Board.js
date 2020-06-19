@@ -122,7 +122,7 @@ const Board = (props) => {
 
         let tickIndex = 1
         let timerID2
-        clearSquares()
+        //clearSquares()
         reDrawBarrier()
         const clearTickInterval = () => {
             clearInterval(timerID2)
@@ -136,6 +136,7 @@ const Board = (props) => {
                 setSquares(squares.slice())
             } else {
                 clearTickInterval(timerID2)
+                setSquares(squares.slice())
                 if(tickArr[tickArr.length - 1] === false) {
                     return (
                         addToast("Path does not exist", {
