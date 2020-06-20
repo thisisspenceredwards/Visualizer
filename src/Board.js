@@ -7,16 +7,18 @@ import axios from "axios"
 
 
 const Board = (props) => {
-    const testingUrl = "https://visualizerbackend.herokuapp.com/"
-   // const testingUrl = "http://localhost:9000/"
+    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
                                                             "To use:  Click a square to set a start location",
                                                                 "Then click another square to select a destination",
                                                                     "You may also set barriers to change the available paths",
-                                                                        "Additionally, for Dijkstra's SPF you can set the weight of each square " +
-                                                                        "changing the algorithm's chosen path"])
+                                                                        "For Dijkstra's SPF you can set the weight of each square " +
+                                                                        "changing the algorithm's chosen path",
+                                                                        "As a note: The path found may not be the 'straightest' path as diagonal moves are valid," +
+                                                                        "but if you count the squares it will be equal to a more intuitive path"])
     const [loading, setLoading] = useState(false)
     let [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
     const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
@@ -338,6 +340,28 @@ const Board = (props) => {
             document.getElementById("addWeights").innerText = "Toggle Weights Off"
 
     }
+    const generateMaze = async () =>
+    {
+        let date1 = new Date()
+        setLoading(true)
+        messageSeparator()
+        updateMessages('Sending data for maze generation', 'Frontend')
+        await axios.post(testingUrl + 'generateMaze', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+            .then(res=>{
+                setLoading(false)
+                dialogToOutput(date1, res.data[0])
+                let arr = res.data[1]
+                let tempBlockedNodes = Array(props.height * props.width).fill(false)
+                for(let i = 0; i < arr.length; i++)
+                {
+                    if(arr[i] === 'black')
+                        tempBlockedNodes[i] = true
+                }
+                setBlockedNodes(tempBlockedNodes)
+                setSquares(res.data[1])
+            })
+            .catch(err => {console.error(err)})
+    }
     const clearCardMessages = () =>
     {
         setCardMessages([])
@@ -385,6 +409,7 @@ const Board = (props) => {
                     <Button className = "btn btn-lg btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generateMaze.bind(this)}>Generate Maze</Button>
                     </div>
 
             </div>
