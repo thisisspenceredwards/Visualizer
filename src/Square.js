@@ -46,7 +46,8 @@ class Square extends React.Component {
         return (
             <Button
                 variant="secondary"
-                className="square"
+                //className = "btn btn-sm btn-primary-controlButton"
+               className="square"
                 id={stateId}
                 onMouseEnter={this.onMouseEnterSquare.bind()}
                 onMouseLeave={this.onMouseLeaveSquare.bind()}

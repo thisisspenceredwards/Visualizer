@@ -7,8 +7,8 @@ import axios from "axios"
 
 
 const Board = (props) => {
-    const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    //const testingUrl = "http://localhost:9000/"
+    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -173,7 +173,10 @@ const Board = (props) => {
         }
         let finishedAnimatingFindPath = false
         const tick2 = (findPathArr, shortestPathArr) => {
-            if(!finishedAnimatingFindPath) {
+            if(!finishedAnimatingFindPath)
+            {
+                for(let i = 0; i < 2; i++)
+                {
                 if (tickIndex < findPathArr.length) {
                     //mutating the array directly -- doesn't seem to update promptly otherwise
                     if(!(findPathArr[tickIndex] === endMarkerIndex) && !(findPathArr[tickIndex] === startMarkerIndex))
@@ -185,6 +188,7 @@ const Board = (props) => {
                     squares[endMarkerIndex] = 'gold'
                     setSquares(squares.slice())
                     tickIndex = 0
+                }
                 }
             }
             else
@@ -204,7 +208,7 @@ const Board = (props) => {
         }
         timerID2 = setInterval(
             () => tick2(findPathArr, shortestPathArr),
-            10
+            0
         )
     }
 
@@ -383,11 +387,12 @@ const Board = (props) => {
     }
     const toggleOpen = () => setDropDownMenu(!dropDownMenu)
     const menuClass = `dropdown-menu ${ dropDownMenu? " show": ""}`
+
     return (
         <div id={"box"}>
             <div id={"leftBox"}>
                     <div id = "buttons1" className = "btn-group-vertical" role={"group"}>
-                    <div className="btn-group" role="group">
+                        <div className="btn-group" role="group">
                         <button id="btnGroupDrop1" type="button"  onClick = {toggleOpen.bind(this)} className="btn btn-primary dropdown-toggle"
                                 data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
                             Algorithms
@@ -413,14 +418,13 @@ const Board = (props) => {
                     </div>
 
             </div>
-        <div id={"centerBox"}>
-         {parent}
-        </div>
-            <div id={"rightBox"}>
-                  <MyCard loading = {loading} clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
+
+            <div id={"centerBox"}>
+                {parent}
+                <div id={"rightBox"}>
+                    <MyCard loading = {loading} clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
+                </div>
             </div>
-
-
 
         </div>
     );

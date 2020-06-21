@@ -36,6 +36,7 @@
 .square {
   height: 5vh;
   width: 5vh;
+  font-size: 1vh;
 
 }
 .game {
@@ -48,7 +49,7 @@
   margin-left: 2vh;
 }
 .card{
-  width: auto;
+  width: 50vh;
   padding: 1vh;
   height:100vh;
   overflow: scroll;
@@ -60,22 +61,46 @@
 #headerButton{
   float:left;
 }
+.board-row{
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+
+}
 #box {
+  width:auto;
+  height: auto;
   display: flex;
   background-color: darkgrey;
 }
 #leftBox{
-  height: 100vh;
+  padding-left: 1%;
+  height: auto;
+  width : auto;
   background-color: cornflowerblue;
-  width : 10%;
+
 }
 #centerBox{
-  float:left;
-  height: 100vh;
+  padding-left: 2%;
+  width: auto;
+  display:inline-flex;
+  -webkit-transform:scale(0.5);
+  -moz-transform:scale(0.5);
+  -ms-transform:scale(0.5);
+  transform:scale(0.5);
+  transform-origin: top left;
 }
+
 #rightBox{
-  float:right;
-  width: 30%;
+  padding-left: 8%;
+  width: auto;
+  height: 100vh;
+  -webkit-transform:scale(2);
+  -moz-transform:scale(2);
+  -ms-transform:scale(2);
+  transform:scale(2);
+  transform-origin: top;
+
 }
 
 a:hover {
@@ -83,8 +108,6 @@ a:hover {
   background-color: grey;
   text-align: center;
 }
-
-
 
 /*.square:focus{
   outline: none;
