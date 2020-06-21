@@ -33,12 +33,13 @@
 {
   background-color: gold;
 }
-.square {
+.btn.btn-secondary.square {
   height: 5vh;
   width: 5vh;
-  font-size: 1vh;
+  font-size: 3vh;
 
 }
+
 .game {
   width: 100%;
   height: 100%;
