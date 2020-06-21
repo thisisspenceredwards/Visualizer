@@ -82,6 +82,7 @@
 
 }
 #centerBox{
+  z-index: 10000;
   padding-left: 2%;
   width: auto;
   display:inline-flex;
@@ -93,6 +94,7 @@
 }
 
 #rightBox{
+  z-index: -1;
   padding-left: 8%;
   width: auto;
   height: 100vh;
