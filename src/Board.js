@@ -7,8 +7,8 @@ import axios from "axios"
 
 
 const Board = (props) => {
-    const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    //const testingUrl = "http://localhost:9000/"
+    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -124,8 +124,8 @@ const Board = (props) => {
 
         let tickIndex = 1
         let timerID2
-        clearSquares()
-        reDrawBarrier()
+        resetRun()
+        //reDrawBarrier()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -166,8 +166,8 @@ const Board = (props) => {
         const shortestPathArr = arr[1]
         let tickIndex = 0
         let timerID2
-        clearSquares()
-        reDrawBarrier()
+        resetRun()
+        //reDrawBarrier()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -179,16 +179,19 @@ const Board = (props) => {
                 {
                 if (tickIndex < findPathArr.length) {
                     //mutating the array directly -- doesn't seem to update promptly otherwise
-                    if(!(findPathArr[tickIndex] === endMarkerIndex) && !(findPathArr[tickIndex] === startMarkerIndex))
+                    if (!(findPathArr[tickIndex] === endMarkerIndex) && !(findPathArr[tickIndex] === startMarkerIndex)) {
                         squares[findPathArr[tickIndex]] = 'green'
+                    }
                     tickIndex++
-                    setSquares(squares.slice())
-                } else {
-                    finishedAnimatingFindPath = true
-                    squares[endMarkerIndex] = 'gold'
-                    setSquares(squares.slice())
-                    tickIndex = 0
                 }
+                else
+                    {
+                        finishedAnimatingFindPath = true
+                        squares[endMarkerIndex] = 'gold'
+                        //setSquares(squares.slice())
+                        tickIndex = 0
+                    }
+                    setSquares(squares.slice())
                 }
             }
             else
@@ -289,9 +292,18 @@ const Board = (props) => {
 
     const clearSquares = () => {
         //squares not changing without setting squares explicitly
-        squares = Array(props.height * props.width).fill(null)
-        setSquares(Array(props.height * props.width).fill(null))
-
+        for(let i = 0; i < squares.length; i++) {
+            squares = Array(props.height * props.width).fill(null)
+            setSquares(Array(props.height * props.width).fill(null))
+        }
+    }
+    const resetRun = () =>{
+        for(let i = 0; i < squares.length; i++) {
+            if (squares[i] === 'green' || squares[i] === 'gold') {
+                squares[i] = 'grey'
+            }
+        }
+        setSquares(squares.slice())
     }
     const reDrawBarrier = () =>{
         for(let i = 0; i < squares.length; i++)
@@ -343,6 +355,19 @@ const Board = (props) => {
         else
             document.getElementById("addWeights").innerText = "Toggle Weights Off"
 
+    }
+    const randomizeWeights = async () =>
+    {
+        let date1 = new Date()
+        setLoading(true)
+        messageSeparator()
+        updateMessages('Sending data for random weight generation', 'Frontend')
+        await axios.post(testingUrl + 'weightGeneration', {SIZE})
+            .then(res => {
+                setLoading(false)
+                dialogToOutput(date1, res.data[0])
+                setWeights(res.data[1])
+            })
     }
     const generateMaze = async () =>
     {
@@ -415,6 +440,8 @@ const Board = (props) => {
                     <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generateMaze.bind(this)}>Generate Maze</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
                     </div>
 
             </div>

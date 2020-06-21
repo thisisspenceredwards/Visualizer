@@ -16,6 +16,7 @@
 }
 #black{
   background-color: black;
+  color: black;
 }
 #slateGrey
 {
@@ -37,6 +38,7 @@
   height: 5vh;
   width: 5vh;
   font-size: 3vh;
+
 
 }
 
