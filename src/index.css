@@ -75,6 +75,7 @@
   background-color: darkgrey;
 }
 #leftBox{
+  z-index: 1;
   padding-left: 1%;
   height: auto;
   width : auto;
@@ -82,7 +83,7 @@
 
 }
 #centerBox{
-  z-index: 10000;
+  z-index: 0;
   padding-left: 2%;
   width: auto;
   display:inline-flex;

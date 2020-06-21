@@ -7,8 +7,8 @@ import axios from "axios"
 
 
 const Board = (props) => {
-    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    const testingUrl = "http://localhost:9000/"
+    const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    //const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
