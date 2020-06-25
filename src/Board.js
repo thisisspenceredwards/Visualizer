@@ -160,7 +160,6 @@ const Board = (props) => {
             10
         )
     }
-
     let animateWithReturnPath = (arr) => {
         const findPathArr = arr[0]
         const shortestPathArr = arr[1]
@@ -230,12 +229,12 @@ const Board = (props) => {
 
     let renderSquare = (count) => {
         let state = 'slateGrey'
-        if (squares[count] === 'gold' || squares[count] === 'green' || squares[count] === 'black')
+        //if (squares[count] === 'gold' || squares[count] === 'green' || squares[count] === 'black')
             state = squares[count]
-        else if (count === startMarkerIndex)
-            state = 'startMarker'
-        else if (count === endMarkerIndex)
-            state = 'endMarker'
+        //else if (count === startMarkerIndex)
+           // state = 'startMarker'
+        //else if (count === endMarkerIndex)
+          //  state = 'endMarker'
         return (<Square id={state} index={count} weight = {weights[count]} onClick={fork.bind(this, count)} key={count}/>)
     }
     let fork = (i) => {
@@ -246,7 +245,6 @@ const Board = (props) => {
     }
     let SetMarker = (i) => {
         let toastMessage = ""
-        let arr = squares.slice()
         let startStateMarker = startMarkerIndex;
         let endStateMarker = endMarkerIndex;
         if (barrier) {
@@ -256,23 +254,27 @@ const Board = (props) => {
             setSquares(squares.slice())
             return
         } else if (startStateMarker === i) {
+            squares[i] = 'grey'
             startStateMarker = -1
-            arr[i] = undefined
+            //arr[i] = undefined
             toastMessage = "Deselected Start Location"
         } else if (startStateMarker < 0 && endStateMarker === i) {
             endStateMarker = -1
-            //arr[i] = undefined
+            //squares[i] = 'grey'
             toastMessage = "Deselected End Location"
         } else if (startStateMarker < 0) {
             startStateMarker = i
+            squares[i] = 'startMarker'
             //arr[i] = 'O'
             toastMessage = "Start Location Selected"
         } else if (endStateMarker === i) {
+            //squares[i] = 'grey'
             endStateMarker = -1
             //arr[i] = undefined
             toastMessage = "Deselected End Location"
         } else if (endStateMarker < 0) {
             endStateMarker = i
+            squares[i] = 'endMarker'
             //arr[i] = 'X'
             toastMessage = "Selected End Location"
         } else {
