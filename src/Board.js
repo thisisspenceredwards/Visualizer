@@ -167,32 +167,30 @@ const Board = (props) => {
         let tickIndex = 0
         let timerID2
         resetRun()
-        //reDrawBarrier()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
         let finishedAnimatingFindPath = false
-        const tick2 = (findPathArr, shortestPathArr) => {
+        const tick2 = (findPathArr, shortestPathArr) =>
+        {
             if(!finishedAnimatingFindPath)
             {
-                for(let i = 0; i < 2; i++)
+                if (tickIndex <= findPathArr.length)
                 {
-                if (tickIndex < findPathArr.length) {
                     //mutating the array directly -- doesn't seem to update promptly otherwise
-                    if (!(findPathArr[tickIndex] === endMarkerIndex) && !(findPathArr[tickIndex] === startMarkerIndex)) {
+                    if (findPathArr[tickIndex] !== endMarkerIndex && findPathArr[tickIndex] !== startMarkerIndex)
+                    {
                         squares[findPathArr[tickIndex]] = 'green'
                     }
                     tickIndex++
                 }
                 else
-                    {
-                        finishedAnimatingFindPath = true
-                        squares[endMarkerIndex] = 'gold'
-                        //setSquares(squares.slice())
-                        tickIndex = 0
-                    }
-                    setSquares(squares.slice())
+                {
+                    finishedAnimatingFindPath = true
+                    squares[endMarkerIndex] = 'gold'
+                    tickIndex = 0
                 }
+                setSquares(squares.slice())
             }
             else
             {
