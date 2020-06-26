@@ -28,7 +28,7 @@ const Board = (props) => {
     let [squares, setSquares] = useState(Array(SIZE).fill('grey'))
     let [weights, setWeights] = useState(Array(SIZE).fill(1))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
-    const [dropDownMenu, setDropDownMenu] = useState(false)
+    const [dropDownMenu, setDropDownMenu] = useState(Array(2).fill(false))
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
     const [barrier, setBarrier] = useState(false)
     const {addToast} = useToasts()
@@ -429,32 +429,51 @@ const Board = (props) => {
         }
         parent.push(<div key={i} className={"board-row"}>{children}</div>)
     }
-    const toggleOpen = () => setDropDownMenu(!dropDownMenu)
-    const menuClass = `dropdown-menu ${ dropDownMenu? " show": ""}`
-
+    const toggleOpen = (i) =>
+    {
+        const temp = dropDownMenu.slice()
+        temp[i] = !dropDownMenu[i]
+        setDropDownMenu(temp)
+    }
+    const menuClass1 = `dropdown-menu ${ dropDownMenu[0]? " show": ""}`
+    const menuClass2 = `dropdown-menu ${ dropDownMenu[1]? " show": ""}`
     return (
         <div id={"box"}>
             <div id={"leftBox"}>
                     <div id = "buttons1" className = "btn-group-vertical" role={"group"}>
                         <div className="btn-group" role="group">
-                        <button id="btnGroupDrop1" type="button"  onClick = {toggleOpen.bind(this)} className="btn btn-primary dropdown-toggle"
+                            <button id="btnGroupDrop" type="button"  onClick = {toggleOpen.bind(this, 0)} className="btn btn-primary dropdown-toggle"
                                 data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
-                            Algorithms
-                        </button>
-                        <div className={menuClass} aria-labelledby="btnGroupDrop1">
-                            <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDepthFirstSearch.bind(this) }>Backend DFS>
-                                Depth First Search
-                                <p> (Does path Exist)</p>
-                          </a>
-                            <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendBreathFirstSearch.bind(this) }>
-                                Breath-First Search
-                                <p>(Shortest Path)</p>
-                            </a>
-                            <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDijkstra.bind(this) }>
-                                Dijkstra's SPF
-                            </a>
+                                Shortest Path Algorithms
+                            </button>
+                            <div className={menuClass1} aria-labelledby="btnGroupDrop1">
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDepthFirstSearch.bind(this) }>
+                                    Depth First Search
+                                    <p> (Does path Exist)</p>
+                                </a>
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendBreathFirstSearch.bind(this) }>
+                                    Breath-First Search
+                                    <p>(Shortest Path)</p>
+                                </a>
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDijkstra.bind(this) }>
+                                    Dijkstra's SPF
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                        <div className="btn-group" role="group">
+                            <button id="btnGroupDrop" type="button"  onClick = {toggleOpen.bind(this, 1)} className="btn btn-primary dropdown-toggle"
+                                    data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
+                                Maze Generation Algorithms
+                            </button>
+                            <div className={menuClass2} aria-labelledby="btnGroupDrop11">
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrims.bind(this) }>
+                                    Prim's Algorithm
+                                </a>
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generateBacktrack.bind(this) }>
+                                    Recursive Backtracking
+                                </a>
+                            </div>
+                        </div>
                     <Button className = "btn btn-lg btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
@@ -464,7 +483,6 @@ const Board = (props) => {
                         <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
                     </div>
-
             </div>
             <div id={"centerBox"}>
                 {parent}
