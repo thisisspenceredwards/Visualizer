@@ -58,7 +58,7 @@
   overflow: scroll;
 }
 .sweet-loading{
- display: inline-block;
+  display: inline-block;
 
 }
 #headerButton{
@@ -72,7 +72,7 @@
 }
 #box {
   width:auto;
-  height: auto;
+  height: 100%;
   display: flex;
   background-color: darkgrey;
 }
@@ -88,6 +88,7 @@
   z-index: 0;
   padding-left: 2%;
   width: auto;
+  height:100vh;
   display:inline-flex;
   -webkit-transform:scale(0.5);
   -moz-transform:scale(0.5);

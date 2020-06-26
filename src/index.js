@@ -10,8 +10,8 @@ class Game extends React.Component {
     {
         super(props)
         this.state =({
-            height : 40,
-            width : 40,
+            //must be square
+            heightAndWidth : 40,
         })
     }
     render() {
@@ -20,12 +20,9 @@ class Game extends React.Component {
             <div id ="body" className="game">
 
                 <div className="game-board">
-                    <ToastProvider autoDismissTimeout={2000} placement="bottom-center">
-                        <Board height = {this.state.height} width = {this.state.width}/>
+                    <ToastProvider id = {"toasty"} autoDismissTimeout={2000} placement="bottom-center">
+                        <Board id={"board"} heightAndWidth = {this.state.heightAndWidth}/>
                     </ToastProvider>
-                </div>
-
-                <div className="game-info">
                 </div>
             </div>
 

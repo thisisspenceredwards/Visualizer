@@ -19,11 +19,14 @@ const Board = (props) => {
                                                                         "changing the algorithm's chosen path",
                                                                         "As a note: The path found may not be the 'straightest' path as diagonal moves are valid," +
                                                                         "but if you count the squares it will be equal to a more intuitive path"])
+    const HEIGHT = props.heightAndWidth
+    const WIDTH = props.heightAndWidth
+    const SIZE = props.heightAndWidth * props.heightAndWidth
     const [loading, setLoading] = useState(false)
     let [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
-    const [blockedNodes, setBlockedNodes] = useState(Array(props.height * props.width).fill(false))
-    let [squares, setSquares] = useState(Array(props.height * props.width).fill(false))
-    let [weights, setWeights] = useState(Array(props.height * props.width).fill(1))
+    const [blockedNodes, setBlockedNodes] = useState(Array(SIZE).fill(false))
+    let [squares, setSquares] = useState(Array(SIZE).fill('grey'))
+    let [weights, setWeights] = useState(Array(SIZE).fill(1))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [dropDownMenu, setDropDownMenu] = useState(false)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
@@ -174,14 +177,16 @@ const Board = (props) => {
         {
             if(!finishedAnimatingFindPath)
             {
-                if (tickIndex <= findPathArr.length)
-                {
-                    //mutating the array directly -- doesn't seem to update promptly otherwise
-                    if (findPathArr[tickIndex] !== endMarkerIndex && findPathArr[tickIndex] !== startMarkerIndex)
+                if (tickIndex <= findPathArr.length) {
+                    for(let i = 0; i < 4; i++)
                     {
-                        squares[findPathArr[tickIndex]] = 'green'
+                        //mutating the array directly -- doesn't seem to update promptly otherwise
+                        if (tickIndex <= findPathArr.length && findPathArr[tickIndex] !== endMarkerIndex && findPathArr[tickIndex] !== startMarkerIndex)
+                        {
+                            squares[findPathArr[tickIndex]] = 'green'
+                        }
+                        tickIndex++
                     }
-                    tickIndex++
                 }
                 else
                 {
@@ -228,14 +233,7 @@ const Board = (props) => {
     }
 
     let renderSquare = (count) => {
-        let state = 'slateGrey'
-        //if (squares[count] === 'gold' || squares[count] === 'green' || squares[count] === 'black')
-            state = squares[count]
-        //else if (count === startMarkerIndex)
-           // state = 'startMarker'
-        //else if (count === endMarkerIndex)
-          //  state = 'endMarker'
-        return (<Square id={state} index={count} weight = {weights[count]} onClick={fork.bind(this, count)} key={count}/>)
+        return (<Square id={squares[count]} index={count} weight = {weights[count]} onClick={fork.bind(this, count)} key={count}/>)
     }
     let fork = (i) => {
         if(weightButton)
@@ -293,8 +291,8 @@ const Board = (props) => {
     const clearSquares = () => {
         //squares not changing without setting squares explicitly
         for(let i = 0; i < squares.length; i++) {
-            squares = Array(props.height * props.width).fill(null)
-            setSquares(Array(props.height * props.width).fill(null))
+            squares = Array(SIZE).fill(null)
+            setSquares(Array(SIZE).fill(null))
         }
     }
     const resetRun = () =>{
@@ -303,9 +301,11 @@ const Board = (props) => {
                 squares[i] = 'grey'
             }
         }
+        squares[startMarkerIndex] = 'startMarker'
+        squares[endMarkerIndex] = 'endMarker'
         setSquares(squares.slice())
     }
-    const reDrawBarrier = () =>{
+    /*const reDrawBarrier = () =>{
         for(let i = 0; i < squares.length; i++)
         {
             if(blockedNodes[i] === true)
@@ -314,16 +314,16 @@ const Board = (props) => {
             }
         }
         setSquares(Array(squares.slice()))
-    }
+    }*/
     const clearBarrier = () => {
-        setBlockedNodes(Array(props.height * props.width).fill(false))
+        setBlockedNodes(Array(SIZE).fill(false))
     }
     const clearMarkers = () => {
         setStartMarkerIndex(-1)
         setEndMarkerIndex(-1)
     }
     const clearWeights = () => {
-        setWeights(Array(props.height * props.width).fill(1))
+        setWeights(Array(SIZE).fill(1))
     }
     const clearGraph = () => {
         clearSquares()
@@ -369,18 +369,40 @@ const Board = (props) => {
                 setWeights(res.data[1])
             })
     }
-    const generateMaze = async () =>
+    const generateBacktrack = async () =>
     {
         let date1 = new Date()
         setLoading(true)
         messageSeparator()
         updateMessages('Sending data for maze generation', 'Frontend')
-        await axios.post(testingUrl + 'generateMaze', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+        await axios.post(testingUrl + 'generateBacktracking', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
                 setLoading(false)
                 dialogToOutput(date1, res.data[0])
                 let arr = res.data[1]
-                let tempBlockedNodes = Array(props.height * props.width).fill(false)
+                let tempBlockedNodes = Array(SIZE).fill(false)
+                for(let i = 0; i < arr.length; i++)
+                {
+                    if(arr[i] === 'black')
+                        tempBlockedNodes[i] = true
+                }
+                setBlockedNodes(tempBlockedNodes)
+                setSquares(res.data[1])
+            })
+            .catch(err => {console.error(err)})
+    }
+    const generatePrims = async () =>
+    {
+        let date1 = new Date()
+        setLoading(true)
+        messageSeparator()
+        updateMessages('Sending data for maze generation', 'Frontend')
+        await axios.post(testingUrl + 'generatePrims', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+            .then(res=>{
+                setLoading(false)
+                dialogToOutput(date1, res.data[0])
+                let arr = res.data[1]
+                let tempBlockedNodes = Array(SIZE).fill(false)
                 for(let i = 0; i < arr.length; i++)
                 {
                     if(arr[i] === 'black')
@@ -399,12 +421,9 @@ const Board = (props) => {
 
     let parent = []
     let count = 0
-    const HEIGHT = props.height
-    const WIDTH = props.width
-    const SIZE = HEIGHT * WIDTH
-    for (let i = 0; i < HEIGHT; i++) {
+    for (let i = 0; i < WIDTH; i++) {
         let children = []
-        for (let j = 0; j < WIDTH; j++) {
+        for (let j = 0; j < HEIGHT; j++) {
             children.push(renderSquare(count))
             count++
         }
@@ -439,19 +458,22 @@ const Board = (props) => {
                     <Button className = "btn btn-lg btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-                    <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generateMaze.bind(this)}>Generate Maze</Button>
-                    <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
+                    <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generatePrims.bind(this)}>Generate Maze (Prim's)</Button>
+                        <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generateBacktrack.bind(this)}>Generate Maze (Recursive)</Button>
+
+                        <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
                     </div>
 
             </div>
-
             <div id={"centerBox"}>
                 {parent}
                 <div id={"rightBox"}>
                     <MyCard loading = {loading} clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
+
                 </div>
             </div>
+
 
         </div>
     );
@@ -460,3 +482,6 @@ const Board = (props) => {
 export default Board
 
 
+/*
+
+ */

@@ -5,7 +5,7 @@ class Square extends React.Component {
         super(props)
         this.state = {
             hover: false,
-            id: '',
+            id: 'grey',
             weight: 0
         }
         this.onMouseEnterSquare = this.onMouseEnterSquare.bind(this)
@@ -46,7 +46,6 @@ class Square extends React.Component {
         return (
             <Button
                 variant="secondary"
-                //className = "btn btn-sm btn-primary-controlButton"
                className="square"
                 id={stateId}
                 onMouseEnter={this.onMouseEnterSquare.bind()}
