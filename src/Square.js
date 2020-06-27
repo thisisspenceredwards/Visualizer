@@ -14,6 +14,9 @@ class Square extends React.Component {
     }
 
     onMouseEnterSquare() {
+        console.log("this is id: "  + this.props.id)
+        if(this.props.id === 'black')
+            return
         this.setState({
             id: 'redBackground',
             hover: true
@@ -28,8 +31,6 @@ class Square extends React.Component {
     }
     onClick() {
         this.props.onClick()
-        //this.setWeight()
-
     }
     shouldComponentUpdate(nextProps, nextState, nextContext)
     {

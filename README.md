@@ -1,3 +1,8 @@
+Probably about time to refactor
+
+added recursive backtracking algorithm
+currently adding prim's minimum spanning tree
+
 https://thisisspenceredwards.github.io/Visualizer/
 <br>
 https://visualizerbackend.herokuapp.com

@@ -245,7 +245,11 @@ const Board = (props) => {
         let toastMessage = ""
         let startStateMarker = startMarkerIndex;
         let endStateMarker = endMarkerIndex;
-        if (barrier) {
+        if(blockedNodes[i]) //is already a blocked node.  Nothing to do with those
+        {
+            return
+        }
+        if (barrier) { //manually setting barrier
             blockedNodes[i] = true
             setBlockedNodes(blockedNodes.slice())
             squares[i] = 'black'
@@ -391,13 +395,35 @@ const Board = (props) => {
             })
             .catch(err => {console.error(err)})
     }
-    const generatePrims = async () =>
+    const generatePrimsTree = async () =>
     {
         let date1 = new Date()
         setLoading(true)
         messageSeparator()
         updateMessages('Sending data for maze generation', 'Frontend')
-        await axios.post(testingUrl + 'generatePrims', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+        await axios.post(testingUrl + 'primsTree', {startMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
+            .then(res=>{
+                /*setLoading(false)
+                dialogToOutput(date1, res.data[0])
+                let arr = res.data[1]
+                let tempBlockedNodes = Array(SIZE).fill(false)
+                for(let i = 0; i < arr.length; i++)
+                {
+                    if(arr[i] === 'black')
+                        tempBlockedNodes[i] = true
+                }
+                setBlockedNodes(tempBlockedNodes)
+                setSquares(res.data[1])*/
+            })
+            .catch(err => {console.error(err)})
+    }
+    const generatePrimsMaze = async () =>
+    {
+        let date1 = new Date()
+        setLoading(true)
+        messageSeparator()
+        updateMessages('Sending data for maze generation', 'Frontend')
+        await axios.post(testingUrl + 'generatePrimsMaze', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
                 setLoading(false)
                 dialogToOutput(date1, res.data[0])
@@ -431,8 +457,9 @@ const Board = (props) => {
     }
     const toggleOpen = (i) =>
     {
-        const temp = dropDownMenu.slice()
+        const temp = [false, false]
         temp[i] = !dropDownMenu[i]
+
         setDropDownMenu(temp)
     }
     const menuClass1 = `dropdown-menu ${ dropDownMenu[0]? " show": ""}`
@@ -458,6 +485,9 @@ const Board = (props) => {
                                 <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDijkstra.bind(this) }>
                                     Dijkstra's SPF
                                 </a>
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrimsTree.bind(this) }>
+                                    Prim's Minimum Spanning Tree
+                                </a>
                             </div>
                         </div>
                         <div className="btn-group" role="group">
@@ -466,20 +496,18 @@ const Board = (props) => {
                                 Maze Generation Algorithms
                             </button>
                             <div className={menuClass2} aria-labelledby="btnGroupDrop11">
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrims.bind(this) }>
-                                    Prim's Algorithm
+                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrimsMaze.bind(this) }>
+                                    Prim's Maze
                                 </a>
                                 <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generateBacktrack.bind(this) }>
                                     Recursive Backtracking
                                 </a>
+
                             </div>
                         </div>
                     <Button className = "btn btn-lg btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-                    <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generatePrims.bind(this)}>Generate Maze (Prim's)</Button>
-                        <Button className = "btn btn-lg btn-primary-controlButton" id = "maze" onClick = { generateBacktrack.bind(this)}>Generate Maze (Recursive)</Button>
-
                         <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
                     </div>
