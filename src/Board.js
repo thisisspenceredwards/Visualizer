@@ -7,8 +7,8 @@ import axios from "axios"
 
 
 const Board = (props) => {
-    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    const testingUrl = "http://localhost:9000/"
+    const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    //const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -260,31 +260,35 @@ const Board = (props) => {
             startStateMarker = -1
             //arr[i] = undefined
             toastMessage = "Deselected Start Location"
+            resetRun()
+           // clearAlgorithm()
+           // resetRun()
         } else if (startStateMarker < 0 && endStateMarker === i) {
             endStateMarker = -1
-            //squares[i] = 'grey'
+            squares[i] = 'grey'
+            resetRun()
             toastMessage = "Deselected End Location"
         } else if (startStateMarker < 0) {
             startStateMarker = i
             squares[i] = 'startMarker'
-            //arr[i] = 'O'
             toastMessage = "Start Location Selected"
         } else if (endStateMarker === i) {
-            //squares[i] = 'grey'
+            squares[i] = 'grey'
             endStateMarker = -1
-            //arr[i] = undefined
+            resetRun()
             toastMessage = "Deselected End Location"
         } else if (endStateMarker < 0) {
             endStateMarker = i
             squares[i] = 'endMarker'
-            //arr[i] = 'X'
             toastMessage = "Selected End Location"
         } else {
             return
         }
         setStartMarkerIndex(startStateMarker)
         setEndMarkerIndex(endStateMarker)
-        setSquares(squares)
+        squares[startStateMarker] = 'startMarker'
+        squares[endStateMarker] = 'endMarker'
+        setSquares(squares.slice())
         return (
             addToast(toastMessage, {
                 appearance: 'info',
@@ -305,20 +309,8 @@ const Board = (props) => {
                 squares[i] = 'grey'
             }
         }
-        squares[startMarkerIndex] = 'startMarker'
-        squares[endMarkerIndex] = 'endMarker'
         setSquares(squares.slice())
     }
-    /*const reDrawBarrier = () =>{
-        for(let i = 0; i < squares.length; i++)
-        {
-            if(blockedNodes[i] === true)
-            {
-                squares[i] = 'black'
-            }
-        }
-        setSquares(Array(squares.slice()))
-    }*/
     const clearBarrier = () => {
         setBlockedNodes(Array(SIZE).fill(false))
     }
