@@ -4,11 +4,12 @@ import {useToasts} from "react-toast-notifications";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
 import axios from "axios"
+import queryBackendHigherOrderFunction from "./QueryBackend"
 
 
 const Board = (props) => {
-    const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    //const testingUrl = "http://localhost:9000/"
+    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -34,6 +35,33 @@ const Board = (props) => {
     const {addToast} = useToasts()
     const [weightButton, setWeightButton] = useState(false)
 
+/*******************************************/
+    /*
+    Methods for Card messages and responses
+     */
+    const backendResponse = (date1, data) =>
+    {
+        setLoading(false)
+        const date2 = new Date()
+        const time = Math.abs(date2-date1)
+        updateMessages(data, 'Backend'  )
+        updateMessages('Query round trip time: ' +  time + " milliseconds", 'Frontend')
+    }
+    const frontendInitialMessage = (message) =>
+    {
+        const valid = checkForValidMarkers()
+        if(valid !== null)
+            return valid
+        setLoading(true)
+        messageSeparator()
+        updateMessages(message, 'Frontend')
+        return null
+    }
+    const messageSeparator = () =>
+    {
+        updateMessages(" ", " *************************  ")
+    }
+
     const updateMessages = (data, sender) =>
     {
         cardMessages.unshift(data)
@@ -42,93 +70,39 @@ const Board = (props) => {
         setBackEndOrFrontEnd(backendOrFrontEnd.slice())
 
     }
-    const dialogToOutput = (date1, data) =>
+    const clearCardMessages = () =>
     {
-        setLoading(false)
-        const date2 = new Date()
-        const time = Math.abs(date2-date1)
-        updateMessages(data, 'Backend'  )
-        updateMessages('Query round trip time: ' +  time + " milliseconds", 'Frontend')
+        setCardMessages([])
+        setBackEndOrFrontEnd([])
     }
-    let backendDijkstra = async () =>
+    /*********************************************/
+    //Higher order function to make querying the backend more concise and easier
+    const queryBackend = queryBackendHigherOrderFunction(testingUrl, SIZE, WIDTH, backendResponse, addToast)
+   /******************************************/
+    /* Methods for SPF algorithms */
+    let backendDijkstra = () =>
     {
-        const date1 = new Date()
-        const valid = checkForValidMarkers()
-        if(valid !== null)
-        {
-            return valid
-        }
-        setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for Dijkstra', 'Frontend')
-        await axios.post(testingUrl + 'dijkstra', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
-            .then(res=>{
-                dialogToOutput(date1, res.data[0])
-                if(!res.data[1] === false) {
-                    animateWithReturnPath(res.data[1])
-                }
-                else
-                    return (
-                        addToast("Path does not exist", {
-                            appearance: 'warning',
-                            autoDismiss: true,
-                        }))
-            })
-            .catch(err => {console.error(err)})
+        const value = frontendInitialMessage('Sending data for Dijkstra')
+        if(value !== null) return value
+        queryBackend('dijkstra', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("hey"))
     }
-    const backendDepthFirstSearch = async () =>
+    const backendDepthFirstSearch = () =>
     {
-        const date1 = new Date()
-        const valid =checkForValidMarkers()
-        if(valid!== null) {
-            return valid
-        }
-        setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for DFS', 'Frontend')
-        await axios.post(testingUrl + 'depthFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes})
-            .then(res=>{
-                dialogToOutput(date1, res.data[0])
-                animateWithoutReturnPath(res.data[1])
-            })
-            .catch(err => {console.error(err)})
-    }
-    const messageSeparator = () =>
-    {
-        updateMessages(" ", " *************************  ")
-    }
-    let backendBreathFirstSearch = async () => {
-        let date1 = new Date()
-        const valid =checkForValidMarkers()
-        if(valid!== null)
-        {
-            return valid
-        }
-        setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for BFS', 'Frontend')
-        await axios.post(testingUrl + 'breathFirstSearch', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
-            .then(res=>{
-                dialogToOutput(date1, res.data[0])
-                if(!res.data[1] === false) {
-                    animateWithReturnPath(res.data[1])
-                }
-                else
-                    return (
-                        addToast("Path does not exist", {
-                            appearance: 'warning',
-                            autoDismiss: true,
-                        }))
-            })
-            .catch(err => {console.error(err)})
+        const value = frontendInitialMessage('Sending data for DFS')
+        if(value !== null) return value
+        queryBackend('depthFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithoutReturnPath).then(r => console.log("ok"))
     }
 
+    const backendBreathFirstSearch = () => {
+        const value = frontendInitialMessage("Sending data for BFS")
+        if(value !== null) return value
+        queryBackend('breathFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("ok"))
+    }
+    /********************************************************/
     let animateWithoutReturnPath = (arr) => {
-
         let tickIndex = 1
         let timerID2
-        resetRun()
-        //reDrawBarrier()
+        secondResetRun()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -168,7 +142,7 @@ const Board = (props) => {
         const shortestPathArr = arr[1]
         let tickIndex = 0
         let timerID2
-        resetRun()
+        secondResetRun()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -232,15 +206,7 @@ const Board = (props) => {
         } else return null
     }
 
-    let renderSquare = (count) => {
-        return (<Square id={squares[count]} index={count} weight = {weights[count]} onClick={fork.bind(this, count)} key={count}/>)
-    }
-    let fork = (i) => {
-        if(weightButton)
-            setWeight(i)
-        else
-            SetMarker(i)
-    }
+
     let SetMarker = (i) => {
         let toastMessage = ""
         let startStateMarker = startMarkerIndex;
@@ -311,6 +277,16 @@ const Board = (props) => {
         }
         setSquares(squares.slice())
     }
+    const secondResetRun = () =>{
+        for(let i = 0; i < squares.length; i++) {
+            if (squares[i] === 'green' || squares[i] === 'gold') {
+                squares[i] = 'grey'
+            }
+        }
+        squares[startMarkerIndex] = 'startMarker'
+        squares[endMarkerIndex] = 'endMarker'
+        setSquares(squares.slice())
+    }
     const clearBarrier = () => {
         setBlockedNodes(Array(SIZE).fill(false))
     }
@@ -361,7 +337,7 @@ const Board = (props) => {
         await axios.post(testingUrl + 'weightGeneration', {SIZE})
             .then(res => {
                 setLoading(false)
-                dialogToOutput(date1, res.data[0])
+                backendResponse(date1, res.data[0])
                 setWeights(res.data[1])
             })
     }
@@ -374,7 +350,7 @@ const Board = (props) => {
         await axios.post(testingUrl + 'generateBacktracking', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
                 setLoading(false)
-                dialogToOutput(date1, res.data[0])
+                backendResponse(date1, res.data[0])
                 let arr = res.data[1]
                 let tempBlockedNodes = Array(SIZE).fill(false)
                 for(let i = 0; i < arr.length; i++)
@@ -396,7 +372,7 @@ const Board = (props) => {
         await axios.post(testingUrl + 'primsTree', {startMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
             .then(res=>{
                 /*setLoading(false)
-                dialogToOutput(date1, res.data[0])
+                backendResponse(date1, res.data[0])
                 let arr = res.data[1]
                 let tempBlockedNodes = Array(SIZE).fill(false)
                 for(let i = 0; i < arr.length; i++)
@@ -418,7 +394,7 @@ const Board = (props) => {
         await axios.post(testingUrl + 'generatePrimsMaze', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
             .then(res=>{
                 setLoading(false)
-                dialogToOutput(date1, res.data[0])
+                backendResponse(date1, res.data[0])
                 let arr = res.data[1]
                 let tempBlockedNodes = Array(SIZE).fill(false)
                 for(let i = 0; i < arr.length; i++)
@@ -431,12 +407,30 @@ const Board = (props) => {
             })
             .catch(err => {console.error(err)})
     }
-    const clearCardMessages = () =>
-    {
-        setCardMessages([])
-        setBackEndOrFrontEnd([])
-    }
 
+    /**************************************/
+    /* methods to control menus */
+
+    let renderSquare = (count) => {
+        return (<Square id={squares[count]} index={count} weight = {weights[count]} onClick={fork.bind(this, count)} key={count}/>)
+    }
+    let fork = (i) => {
+        if(weightButton)
+            setWeight(i)
+        else
+            SetMarker(i)
+    }
+    const toggleOpen = (i) =>
+    {
+        const temp = [false, false]
+        temp[i] = !dropDownMenu[i]
+        setDropDownMenu(temp)
+    }
+    const menuClass1 = `dropdown-menu ${ dropDownMenu[0]? " show": ""}`
+    const menuClass2 = `dropdown-menu ${ dropDownMenu[1]? " show": ""}`
+
+    /***************************************/
+    /* everything below is to render the board*/
     let parent = []
     let count = 0
     for (let i = 0; i < WIDTH; i++) {
@@ -447,15 +441,7 @@ const Board = (props) => {
         }
         parent.push(<div key={i} className={"board-row"}>{children}</div>)
     }
-    const toggleOpen = (i) =>
-    {
-        const temp = [false, false]
-        temp[i] = !dropDownMenu[i]
 
-        setDropDownMenu(temp)
-    }
-    const menuClass1 = `dropdown-menu ${ dropDownMenu[0]? " show": ""}`
-    const menuClass2 = `dropdown-menu ${ dropDownMenu[1]? " show": ""}`
     return (
         <div id={"box"}>
             <div id={"leftBox"}>
@@ -479,6 +465,7 @@ const Board = (props) => {
                                 </a>
                                 <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrimsTree.bind(this) }>
                                     Prim's Minimum Spanning Tree
+                                    <p>(Not yet implemented)</p>
                                 </a>
                             </div>
                         </div>
