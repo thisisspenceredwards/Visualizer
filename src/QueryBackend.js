@@ -7,12 +7,33 @@ responding that there are no return values to animate
  */
 
 
+export const queryBackendHigherOrderFunctionMaze =  (testingUrl, SIZE, WIDTH, HEIGHT, backendResponse, addToast, setBlockedNodes, setSquares) =>
+
+    async (urlSuffix, startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights) =>
+    {
+
+    await axios.post(testingUrl + urlSuffix, {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+    .then(res=>{
+        const date1 = new Date()
+        backendResponse(date1, res.data[0])
+        let arr = res.data[1]
+        let tempBlockedNodes = Array(SIZE).fill(false)
+        for(let i = 0; i < arr.length; i++)
+        {
+            if(arr[i] === 'black')
+                tempBlockedNodes[i] = true
+        }
+        setBlockedNodes(tempBlockedNodes)
+        setSquares(res.data[1])
+    })
+    .catch(err => {console.error(err)})
+    }
 
 
 
 
 
-const queryBackendHigherOrderFunction =  (testingUrl, SIZE, WIDTH, dialogToOutput, addToast) =>
+export const queryBackendHigherOrderFunctionSPF =  (testingUrl, SIZE, WIDTH, backendResponse, addToast) =>
 
     async  (urlSuffix, startMarkerIndex, endMarkerIndex, blockedNodes, weights, animate) => {
 
@@ -20,7 +41,7 @@ const queryBackendHigherOrderFunction =  (testingUrl, SIZE, WIDTH, dialogToOutpu
             })
                 .then(res => {
                     const date1 = new Date()
-                    dialogToOutput(date1, res.data[0])
+                    backendResponse(date1, res.data[0])
                     if (res.data[1] !== null ) {
                         animate(res.data[1])
                     } else
@@ -35,4 +56,4 @@ const queryBackendHigherOrderFunction =  (testingUrl, SIZE, WIDTH, dialogToOutpu
                 })
         }
 
-export default queryBackendHigherOrderFunction
+

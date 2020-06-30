@@ -4,12 +4,12 @@ import {useToasts} from "react-toast-notifications";
 import Button from "react-bootstrap/Button";
 import Square from "./Square"
 import axios from "axios"
-import queryBackendHigherOrderFunction from "./QueryBackend"
+import {queryBackendHigherOrderFunctionSPF, queryBackendHigherOrderFunctionMaze} from "./QueryBackend"
 
 
 const Board = (props) => {
-    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    const testingUrl = "http://localhost:9000/"
+    const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    //const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -47,11 +47,11 @@ const Board = (props) => {
         updateMessages(data, 'Backend'  )
         updateMessages('Query round trip time: ' +  time + " milliseconds", 'Frontend')
     }
-    const frontendInitialMessage = (message) =>
+    const frontendInitialMessage = (message, caller) =>
     {
-        const valid = checkForValidMarkers()
-        if(valid !== null)
-            return valid
+        if(caller === true)
+            if(checkForValidMarkers())
+                return
         setLoading(true)
         messageSeparator()
         updateMessages(message, 'Frontend')
@@ -77,26 +77,42 @@ const Board = (props) => {
     }
     /*********************************************/
     //Higher order function to make querying the backend more concise and easier
-    const queryBackend = queryBackendHigherOrderFunction(testingUrl, SIZE, WIDTH, backendResponse, addToast)
+    const queryBackendSPF = queryBackendHigherOrderFunctionSPF(testingUrl, SIZE, WIDTH, backendResponse, addToast)
+    const queryBackendMaze = queryBackendHigherOrderFunctionMaze(testingUrl, SIZE, WIDTH, HEIGHT, backendResponse, addToast, setBlockedNodes, setSquares)
    /******************************************/
     /* Methods for SPF algorithms */
     let backendDijkstra = () =>
     {
-        const value = frontendInitialMessage('Sending data for Dijkstra')
+        const value = frontendInitialMessage('Sending data for Dijkstra', true)
         if(value !== null) return value
-        queryBackend('dijkstra', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("hey"))
+        queryBackendSPF('dijkstra', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("hey"))
     }
     const backendDepthFirstSearch = () =>
     {
-        const value = frontendInitialMessage('Sending data for DFS')
+        const value = frontendInitialMessage('Sending data for DFS', true)
         if(value !== null) return value
-        queryBackend('depthFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithoutReturnPath).then(r => console.log("ok"))
+        queryBackendSPF('depthFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithoutReturnPath).then(r => console.log("ok"))
     }
 
     const backendBreathFirstSearch = () => {
-        const value = frontendInitialMessage("Sending data for BFS")
+        const value = frontendInitialMessage("Sending data for BFS", true)
         if(value !== null) return value
-        queryBackend('breathFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("ok"))
+
+        queryBackendSPF('breathFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("ok"))
+    }
+    // MAZES
+    const generateBacktrack = () =>
+    {
+        frontendInitialMessage('Sending data for Recursive Backtracking Maze Generation', false)
+        console.log("startMarkerIndex: " + startMarkerIndex)
+        queryBackendMaze('generateBacktracking', startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights).then(r => console.log())
+        console.log("startMarkerIndAfterex: " + startMarkerIndex)
+    }
+
+    const generatePrimsMaze = async () =>
+    {
+        frontendInitialMessage("Sending data for Prim's Maze Generation", false)
+        queryBackendMaze('generatePrimsMaze', startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights).then(r => console.log())
     }
     /********************************************************/
     let animateWithoutReturnPath = (arr) => {
@@ -338,28 +354,7 @@ const Board = (props) => {
                 setWeights(res.data[1])
             })
     }
-    const generateBacktrack = async () =>
-    {
-        let date1 = new Date()
-        setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for maze generation', 'Frontend')
-        await axios.post(testingUrl + 'generateBacktracking', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
-            .then(res=>{
-                setLoading(false)
-                backendResponse(date1, res.data[0])
-                let arr = res.data[1]
-                let tempBlockedNodes = Array(SIZE).fill(false)
-                for(let i = 0; i < arr.length; i++)
-                {
-                    if(arr[i] === 'black')
-                        tempBlockedNodes[i] = true
-                }
-                setBlockedNodes(tempBlockedNodes)
-                setSquares(res.data[1])
-            })
-            .catch(err => {console.error(err)})
-    }
+
     const generatePrimsTree = async () =>
     {
         let date1 = new Date()
@@ -379,28 +374,6 @@ const Board = (props) => {
                 }
                 setBlockedNodes(tempBlockedNodes)
                 setSquares(res.data[1])*/
-            })
-            .catch(err => {console.error(err)})
-    }
-    const generatePrimsMaze = async () =>
-    {
-        let date1 = new Date()
-        setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for maze generation', 'Frontend')
-        await axios.post(testingUrl + 'generatePrimsMaze', {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
-            .then(res=>{
-                setLoading(false)
-                backendResponse(date1, res.data[0])
-                let arr = res.data[1]
-                let tempBlockedNodes = Array(SIZE).fill(false)
-                for(let i = 0; i < arr.length; i++)
-                {
-                    if(arr[i] === 'black')
-                        tempBlockedNodes[i] = true
-                }
-                setBlockedNodes(tempBlockedNodes)
-                setSquares(res.data[1])
             })
             .catch(err => {console.error(err)})
     }
