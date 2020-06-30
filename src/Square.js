@@ -44,6 +44,7 @@ class Square extends React.Component {
             stateId = this.props.id
         else
             stateId = this.state.id
+        console.log(stateId)
         return (
             <Button
                 variant="secondary"
