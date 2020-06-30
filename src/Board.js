@@ -102,7 +102,7 @@ const Board = (props) => {
     let animateWithoutReturnPath = (arr) => {
         let tickIndex = 1
         let timerID2
-        secondResetRun()
+        resetBoardOnAlgorithmRun()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -142,7 +142,7 @@ const Board = (props) => {
         const shortestPathArr = arr[1]
         let tickIndex = 0
         let timerID2
-        secondResetRun()
+        resetBoardOnAlgorithmRun()
         const clearTickInterval = () => {
             clearInterval(timerID2)
         }
@@ -224,15 +224,12 @@ const Board = (props) => {
         } else if (startStateMarker === i) {
             squares[i] = 'grey'
             startStateMarker = -1
-            //arr[i] = undefined
             toastMessage = "Deselected Start Location"
-            resetRun()
-           // clearAlgorithm()
-           // resetRun()
+            resetBoardOnDestinationChange()
         } else if (startStateMarker < 0 && endStateMarker === i) {
             endStateMarker = -1
             squares[i] = 'grey'
-            resetRun()
+            resetBoardOnDestinationChange()
             toastMessage = "Deselected End Location"
         } else if (startStateMarker < 0) {
             startStateMarker = i
@@ -241,7 +238,7 @@ const Board = (props) => {
         } else if (endStateMarker === i) {
             squares[i] = 'grey'
             endStateMarker = -1
-            resetRun()
+            resetBoardOnDestinationChange()
             toastMessage = "Deselected End Location"
         } else if (endStateMarker < 0) {
             endStateMarker = i
@@ -269,7 +266,7 @@ const Board = (props) => {
             setSquares(Array(SIZE).fill(null))
         }
     }
-    const resetRun = () =>{
+    const resetBoardOnDestinationChange = () =>{
         for(let i = 0; i < squares.length; i++) {
             if (squares[i] === 'green' || squares[i] === 'gold') {
                 squares[i] = 'grey'
@@ -277,7 +274,7 @@ const Board = (props) => {
         }
         setSquares(squares.slice())
     }
-    const secondResetRun = () =>{
+    const resetBoardOnAlgorithmRun = () =>{
         for(let i = 0; i < squares.length; i++) {
             if (squares[i] === 'green' || squares[i] === 'gold') {
                 squares[i] = 'grey'
