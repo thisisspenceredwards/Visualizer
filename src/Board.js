@@ -20,6 +20,7 @@ const Board = (props) => {
                                                                         "changing the algorithm's chosen path",
                                                                         "As a note: The path found may not be the 'straightest' path as diagonal moves are valid," +
                                                                         "but if you count the squares it will be equal to a more intuitive path"])
+    const animationTrail = 20
     const HEIGHT = props.heightAndWidth
     const WIDTH = props.heightAndWidth
     const SIZE = props.heightAndWidth * props.heightAndWidth
@@ -115,68 +116,67 @@ const Board = (props) => {
         queryBackendMaze('generatePrimsMaze', startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights).then(r => console.log())
     }
     /********************************************************/
-    let animateWithoutReturnPath = (arr) => {
-        let tickIndex = 1
-        let timerID2
-        resetBoardOnAlgorithmRun()
-        const clearTickInterval = () => {
-            clearInterval(timerID2)
+    const animateTrail = (tickIndex, tickArr) =>
+    {
+        squares[tickArr[tickIndex]] = 'maroon'
+        if(tickIndex > animationTrail) {
+            squares[tickArr[tickIndex-animationTrail]] = 'green'
         }
-        const trail = 7
-        let current = trail
+    }
+    const finishAnimationTrail = (current, tickArr, tickIndex) =>
+    {
+        squares[tickArr[tickIndex-current]] = 'green'
+        current--
+        setSquares(squares.slice())
+        return current
+    }
+    const returnToast = (tickArr) =>
+    {
+        if (tickArr[tickArr.length - 1] === false) {
+            return (
+                addToast("Path does not exist", {
+                    appearance: 'warning',
+                    autoDismiss: true,
+                }))
+        } else {
+            squares[tickArr[tickArr.length - 1]] = 'gold'
+            setSquares(squares.slice())
+            return (
+                addToast("Path does exist", {
+                    appearance: 'success',
+                    autoDismiss: true,
+                }))
+        }
+    }
+    const animateWithoutReturnPath = (arr) => {
+        let tickIndex = 1
+        let current = animationTrail
+        const timerID2 = setInterval(() => tick2(arr), 0)
+        resetBoardOnAlgorithmRun()
         const tick2 = (tickArr) => {
             if (tickIndex < tickArr.length - 1) {
                 //mutating the array directly :/
-                squares[tickArr[tickIndex]] = 'maroon'
-                if(tickIndex > trail) {
-                   squares[tickArr[tickIndex-trail]] = 'green'
-                }
+                animateTrail(tickIndex, tickArr)
                 tickIndex++
                 setSquares(squares.slice())
-            } else
+            } else {
+                if (current > 0)
+                    current = finishAnimationTrail(current, tickArr, tickIndex)
+                else
                 {
-                    if(current > 0)
-                    {
-                        squares[tickArr[tickIndex-current]] = 'green'
-                        current--
-                        setSquares(squares.slice())
-                    }
-                    else {
-                        clearTickInterval(timerID2)
-                        if (tickArr[tickArr.length - 1] === false) {
-                            setSquares(squares.slice())
-                            return (
-                                addToast("Path does not exist", {
-                                    appearance: 'warning',
-                                    autoDismiss: true,
-                                }))
-                        } else {
-                            squares[tickArr[tickArr.length - 1]] = 'gold'
-                            setSquares(squares.slice())
-                            return (
-                                addToast("Path does exist", {
-                                    appearance: 'success',
-                                    autoDismiss: true,
-                                }))
-                        }
-                    }
+                    clearInterval(timerID2)
+                    returnToast(tickArr)
+                }
             }
         }
-        timerID2 = setInterval(
-            () => tick2(arr),
-            10
-        )
+
     }
     let animateWithReturnPath = (arr) => {
-        const trail = 25
         const findPathArr = arr[0]
         const shortestPathArr = arr[1]
+        const timerID2 = setInterval(() => tick2(findPathArr, shortestPathArr), 0)
         let tickIndex = 0
-        let timerID2
         resetBoardOnAlgorithmRun()
-        const clearTickInterval = () => {
-            clearInterval(timerID2)
-        }
         let finishedAnimatingFindPath = false
         const tick2 = (findPathArr, shortestPathArr) =>
         {
@@ -185,14 +185,9 @@ const Board = (props) => {
                 if (tickIndex <= findPathArr.length) {
                     for(let i = 0; i < 4; i++)
                     {
-
                         //mutating the array directly -- doesn't seem to update promptly otherwise
                         if (tickIndex <= findPathArr.length && findPathArr[tickIndex] !== endMarkerIndex && findPathArr[tickIndex] !== startMarkerIndex)
                         {
-                           // squares[findPathArr[tickIndex]] = 'maroon'
-                           // if(tickIndex > trail) {
-                           //     squares[findPathArr[tickIndex-trail]] = 'green'
-                           // }
                             squares[findPathArr[tickIndex]] = 'green'
                         }
                         tickIndex++
@@ -217,14 +212,10 @@ const Board = (props) => {
                 else{
                     squares[shortestPathArr[shortestPathArr.length - 1]] = 'gold'
                     setSquares(squares.slice())
-                    clearTickInterval(timerID2)
+                    clearInterval(timerID2)
                 }
             }
         }
-        timerID2 = setInterval(
-            () => tick2(findPathArr, shortestPathArr),
-            0
-        )
     }
 
     const setWeight = (count) => {
@@ -269,7 +260,7 @@ const Board = (props) => {
             toastMessage = "Deselected End Location"
         } else if (startStateMarker < 0) {
             startStateMarker = i
-            squares[i] = 'startMarker'
+            squares[i] = 'orange'
             toastMessage = "Start Location Selected"
         } else if (endStateMarker === i) {
             squares[i] = 'grey'
@@ -278,15 +269,15 @@ const Board = (props) => {
             toastMessage = "Deselected End Location"
         } else if (endStateMarker < 0) {
             endStateMarker = i
-            squares[i] = 'endMarker'
+            squares[i] = 'cornflowerblue'
             toastMessage = "Selected End Location"
         } else {
             return
         }
         setStartMarkerIndex(startStateMarker)
         setEndMarkerIndex(endStateMarker)
-        squares[startStateMarker] = 'startMarker'
-        squares[endStateMarker] = 'endMarker'
+        squares[startStateMarker] = 'orange'
+        squares[endStateMarker] = 'cornflowerblue'
         setSquares(squares.slice())
         return (
             addToast(toastMessage, {

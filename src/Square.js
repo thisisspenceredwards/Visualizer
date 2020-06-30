@@ -18,14 +18,14 @@ class Square extends React.Component {
         if(this.props.id === 'black')
             return
         this.setState({
-            id: 'redBackground',
+            id: 'red',
             hover: true
         })
     }
 
     onMouseLeaveSquare() {
         this.setState({
-            id: 'blueBackground',
+            id: 'blue',
             hover: false
         })
     }
@@ -34,9 +34,7 @@ class Square extends React.Component {
     }
     shouldComponentUpdate(nextProps, nextState, nextContext)
     {
-        if(nextState.id !== this.state.id || this.props.weight !== nextProps.weight || this.props.id !== nextProps.id)
-            return true
-        return false;
+        return (nextState.id !== this.state.id || this.props.weight !== nextProps.weight || this.props.id !== nextProps.id)
     }
     render() {
         let stateId
@@ -44,12 +42,16 @@ class Square extends React.Component {
             stateId = this.props.id
         else
             stateId = this.state.id
-        console.log(stateId)
+        const divStyle = {
+            background: stateId
+        }
+        console.log("stateid: " + stateId)
         return (
             <Button
                 variant="secondary"
-               className="square"
-                id={stateId}
+                className="square"
+                //id={stateId}
+                style = {divStyle}
                 onMouseEnter={this.onMouseEnterSquare.bind()}
                 onMouseLeave={this.onMouseLeaveSquare.bind()}
                 onClick={this.onClick.bind()}>

@@ -1,8 +1,8 @@
-#startMarker
+#orange  /*start location*/
 {
   background-color: orange;
 }
-#endMarker
+#cornflowerblue /*end location */
 {
   background-color: cornflowerblue;
 }
@@ -22,11 +22,11 @@
 {
   background-color: slategrey;
 }
-#blueBackground
+#blue
 {
   background-color: slategrey;
 }
-#redBackground
+#red
 {
   background-color: red;
 }
