@@ -8,8 +8,8 @@ import {queryBackendHigherOrderFunctionSPF, queryBackendHigherOrderFunctionMaze}
 
 
 const Board = (props) => {
-    const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    //const testingUrl = "http://localhost:9000/"
+    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -20,7 +20,7 @@ const Board = (props) => {
                                                                         "changing the algorithm's chosen path",
                                                                         "As a note: The path found may not be the 'straightest' path as diagonal moves are valid," +
                                                                         "but if you count the squares it will be equal to a more intuitive path"])
-    const animationTrail = 20
+    const animationTrail = 10
     const HEIGHT = props.heightAndWidth
     const WIDTH = props.heightAndWidth
     const SIZE = props.heightAndWidth * props.heightAndWidth
@@ -102,12 +102,9 @@ const Board = (props) => {
         queryBackendSPF('breathFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("ok"))
     }
     // MAZES
-    const generateBacktrack = () =>
-    {
+    const generateBacktrack = () => {
         frontendInitialMessage('Sending data for Recursive Backtracking Maze Generation', false)
-        console.log("startMarkerIndex: " + startMarkerIndex)
         queryBackendMaze('generateBacktracking', startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights).then(r => console.log())
-        console.log("startMarkerIndAfterex: " + startMarkerIndex)
     }
 
     const generatePrimsMaze = async () =>
@@ -119,7 +116,8 @@ const Board = (props) => {
     const animateTrail = (tickIndex, tickArr) =>
     {
         squares[tickArr[tickIndex]] = 'maroon'
-        if(tickIndex > animationTrail) {
+        if(tickIndex > animationTrail)
+        {
             squares[tickArr[tickIndex-animationTrail]] = 'green'
         }
     }
@@ -151,7 +149,7 @@ const Board = (props) => {
     const animateWithoutReturnPath = (arr) => {
         let tickIndex = 1
         let current = animationTrail
-        const timerID2 = setInterval(() => tick2(arr), 0)
+        const timerID2 = setInterval(() => tick2(arr), 10)
         resetBoardOnAlgorithmRun()
         const tick2 = (tickArr) => {
             if (tickIndex < tickArr.length - 1) {
@@ -174,7 +172,7 @@ const Board = (props) => {
     let animateWithReturnPath = (arr) => {
         const findPathArr = arr[0]
         const shortestPathArr = arr[1]
-        const timerID2 = setInterval(() => tick2(findPathArr, shortestPathArr), 0)
+        const timerID2 = setInterval(() => tick2(findPathArr, shortestPathArr), 10)
         let tickIndex = 0
         resetBoardOnAlgorithmRun()
         let finishedAnimatingFindPath = false
@@ -368,25 +366,73 @@ const Board = (props) => {
 
     const generatePrimsTree = async () =>
     {
-        let date1 = new Date()
-        setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for maze generation', 'Frontend')
-        await axios.post(testingUrl + 'primsTree', {startMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
-            .then(res=>{
-                /*setLoading(false)
-                backendResponse(date1, res.data[0])
-                let arr = res.data[1]
-                let tempBlockedNodes = Array(SIZE).fill(false)
-                for(let i = 0; i < arr.length; i++)
-                {
-                    if(arr[i] === 'black')
-                        tempBlockedNodes[i] = true
-                }
-                setBlockedNodes(tempBlockedNodes)
-                setSquares(res.data[1])*/
-            })
-            .catch(err => {console.error(err)})
+        const value = frontendInitialMessage("Sending data for Prims Minimum Spanning Tree", true)
+        if(value !== null) return value
+         let date1 = new Date()
+         setLoading(true)
+         messageSeparator()
+         updateMessages('Sending data for maze generation', 'Frontend')
+         await axios.post(testingUrl + 'primsTree', {startMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
+             .then(res => {
+                 setLoading(false)
+                 backendResponse(date1, res.data[0])
+                 const nodeArr = res.data[1][0]
+                 const edgeArr = res.data[1][1]
+                 const initialWeightList = res.data[1][2]
+                 const endNodeList = res.data[1][3]
+                 const visitedNodeList = res.data[1][4]
+                 const finalWeights = res.data[1][5]
+                 const orderOfTraversal = res.data[1][6]
+                 const directionOfEdges = res.data[1][7]
+                 let tempBlockedNodes = Array(SIZE).fill(false)
+
+                 ///WORK ON tRYING TO ANIMATE ORDER OF TRAVERSAL
+
+
+
+                 const sleep = (milliseconds) => {
+                     const date = Date.now();
+                     let currentDate = null;
+                     do {
+                         currentDate = Date.now();
+                     } while (currentDate - date < milliseconds);
+                 }
+
+                 //FOR INITIAL SETUP DONT ERASE
+                  for(let i = 0; i < nodeArr.length; i++)
+                  {
+                      squares[nodeArr[i]] = 'white'
+                      weights[nodeArr[i]] = '\u221E'
+                  }
+                  setStartMarkerIndex(-1)
+                 if(squares[endMarkerIndex]  !== 'white')
+                     squares[endMarkerIndex] = 'grey'
+                  setEndMarkerIndex(-1)
+                  //squares[startMarkerIndex] = 'orange'
+                  //squares[endMarkerIndex] = 'cornflowerblue'
+                  //setBlockedNodes(tempBlockedNodes)
+                 // setSquares(squares.slice())
+                 // setWeights(initialWeightList)
+
+               // sleep(5000)
+                 //FINAL RESULT
+                 console.log("after sleep")
+
+                 for(let i = 0; i < weights.length; i++)
+                 {
+                     if(directionOfEdges[i][0] !== -1)
+                     {
+                         weights[i] = directionOfEdges[i][1]
+                     }
+                     else
+                         weights[i] = finalWeights[i]
+                 }
+                 setWeights(weights.slice())
+                 setSquares(squares.slice())
+                 console.log(visitedNodeList)
+
+             })
+             .catch(err => {console.error(err)})
     }
 
     /**************************************/
@@ -444,10 +490,6 @@ const Board = (props) => {
                                 <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDijkstra.bind(this) }>
                                     Dijkstra's SPF
                                 </a>
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrimsTree.bind(this) }>
-                                    Prim's Minimum Spanning Tree
-                                    <p>(Not yet implemented)</p>
-                                </a>
                             </div>
                         </div>
                         <div className="btn-group" role="group">
@@ -470,6 +512,7 @@ const Board = (props) => {
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
                         <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
+                           <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { generatePrimsTree.bind(this)}>Create Randomized Directed Acyclic Graph (DAG) (not finished)</Button>
                     </div>
             </div>
             <div id={"centerBox"}>

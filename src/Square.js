@@ -38,19 +38,21 @@ class Square extends React.Component {
     }
     render() {
         let stateId
+        let textColor = 'white'
         if(!this.state.hover)
             stateId = this.props.id
         else
             stateId = this.state.id
+        if(stateId === 'white' || stateId === 'black')
+            textColor = 'black'
         const divStyle = {
-            background: stateId
+            background: stateId,
+            color: textColor
         }
-        console.log("stateid: " + stateId)
         return (
             <Button
                 variant="secondary"
                 className="square"
-                //id={stateId}
                 style = {divStyle}
                 onMouseEnter={this.onMouseEnterSquare.bind()}
                 onMouseLeave={this.onMouseLeaveSquare.bind()}
