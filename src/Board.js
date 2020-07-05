@@ -8,8 +8,8 @@ import {queryBackendHigherOrderFunctionSPF, queryBackendHigherOrderFunctionMaze}
 
 
 const Board = (props) => {
-    //const testingUrl = "https://visualizerbackend.herokuapp.com/"
-    const testingUrl = "http://localhost:9000/"
+    const testingUrl = "https://visualizerbackend.herokuapp.com/"
+    //const testingUrl = "http://localhost:9000/"
     //can likely optimize blockedNodes
     let [cardMessages, setCardMessages] = useState(["Note: If the server has been idle, the initial query may take up to 10 seconds to complete.",
                                                             "Backend is hosted at: https://visualizerbackend.herokuapp.com/",
@@ -366,13 +366,16 @@ const Board = (props) => {
 
     const generatePrimsTree = async () =>
     {
-        const value = frontendInitialMessage("Sending data for Prims Minimum Spanning Tree", true)
-        if(value !== null) return value
+         frontendInitialMessage("Sending data for Prims Minimum Spanning Tree", false)
+         setEndMarkerIndex(-1)
+         setStartMarkerIndex(-1)
          let date1 = new Date()
          setLoading(true)
          messageSeparator()
          updateMessages('Sending data for maze generation', 'Frontend')
-         await axios.post(testingUrl + 'primsTree', {startMarkerIndex, SIZE, WIDTH, blockedNodes, weights })
+         const start = Math.floor(Math.random() * Math.floor(SIZE))
+        console.log(start)
+         await axios.post(testingUrl + 'primsTree', {start, SIZE, WIDTH, blockedNodes})
              .then(res => {
                  setLoading(false)
                  backendResponse(date1, res.data[0])
@@ -390,13 +393,13 @@ const Board = (props) => {
 
 
 
-                 const sleep = (milliseconds) => {
+                 /*const sleep = (milliseconds) => {
                      const date = Date.now();
                      let currentDate = null;
                      do {
                          currentDate = Date.now();
                      } while (currentDate - date < milliseconds);
-                 }
+                 }*/
 
                  //FOR INITIAL SETUP DONT ERASE
                   for(let i = 0; i < nodeArr.length; i++)
@@ -404,10 +407,11 @@ const Board = (props) => {
                       squares[nodeArr[i]] = 'white'
                       weights[nodeArr[i]] = '\u221E'
                   }
-                  setStartMarkerIndex(-1)
-                 if(squares[endMarkerIndex]  !== 'white')
-                     squares[endMarkerIndex] = 'grey'
-                  setEndMarkerIndex(-1)
+
+                  //setStartMarkerIndex(-1)
+                 //if(squares[endMarkerIndex]  !== 'white')
+                  //   squares[endMarkerIndex] = 'grey'
+                  //setEndMarkerIndex(-1)
                   //squares[startMarkerIndex] = 'orange'
                   //squares[endMarkerIndex] = 'cornflowerblue'
                   //setBlockedNodes(tempBlockedNodes)
@@ -416,24 +420,35 @@ const Board = (props) => {
 
                // sleep(5000)
                  //FINAL RESULT
-                 console.log("after sleep")
+                 //console.log("after sleep")
 
                  for(let i = 0; i < weights.length; i++)
                  {
                      if(directionOfEdges[i][0] !== -1)
                      {
-                         weights[i] = directionOfEdges[i][1]
+                         if(directionOfEdges[i][1] === "F")
+                         {
+                             weights[i] = ""
+                         }
+                         else {
+                             weights[i] = directionOfEdges[i][1]
+                             squares[i] = 'white'
+                         }
                      }
                      else
+                     {
                          weights[i] = finalWeights[i]
+                     }
                  }
                  setWeights(weights.slice())
                  setSquares(squares.slice())
-                 console.log(visitedNodeList)
+                 //console.log(visitedNodeList)
 
              })
              .catch(err => {console.error(err)})
+
     }
+
 
     /**************************************/
     /* methods to control menus */
@@ -512,7 +527,7 @@ const Board = (props) => {
                     <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
                         <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
                     <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
-                           <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { generatePrimsTree.bind(this)}>Create Randomized Directed Acyclic Graph (DAG) (not finished)</Button>
+                           <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { generatePrimsTree.bind(this)}>Create Randomized Minimum Spanning Tree (not finished)</Button>
                     </div>
             </div>
             <div id={"centerBox"}>
