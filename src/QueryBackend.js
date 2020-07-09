@@ -11,8 +11,7 @@ export const queryBackendHigherOrderFunctionMaze =  (testingUrl, SIZE, WIDTH, HE
 
     async (urlSuffix, startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights) =>
     {
-
-    await axios.post(testingUrl + urlSuffix, {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
+        await axios.post(testingUrl + urlSuffix, {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, HEIGHT, squares, blockedNodes, weights })
     .then(res=>{
         const date1 = new Date()
         backendResponse(date1, res.data[0])
@@ -31,25 +30,18 @@ export const queryBackendHigherOrderFunctionMaze =  (testingUrl, SIZE, WIDTH, HE
 
 
 
-
-
-export const queryBackendHigherOrderFunctionSPF =  (testingUrl, SIZE, WIDTH, backendResponse, addToast) =>
+export const queryBackendHigherOrderFunctionSPF = (testingUrl, SIZE, WIDTH, backendResponse, addToast) =>
 
     async  (urlSuffix, startMarkerIndex, endMarkerIndex, blockedNodes, weights, animate) => {
-
-            await axios.post(testingUrl  + urlSuffix, {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights
+        await axios.post(testingUrl  + urlSuffix, {startMarkerIndex, endMarkerIndex, SIZE, WIDTH, blockedNodes, weights
             })
                 .then(res => {
                     const date1 = new Date()
                     backendResponse(date1, res.data[0])
-                    if (res.data[1] !== null ) {
-                        animate(res.data[1])
-                    } else
-                        return (
-                            addToast("Path does not exist", {
-                                appearance: 'warning',
-                                autoDismiss: true,
-                            }))
+                    if (res.data[1] !== null )
+                        animate(res.data[1], startMarkerIndex, endMarkerIndex)
+                    else
+                        return (addToast("Path does not exist", {appearance: 'warning', autoDismiss: true,}))
                 })
                 .catch(err => {
                     console.error(err)

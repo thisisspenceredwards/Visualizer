@@ -1,9 +1,11 @@
 import React, {useState} from "react";
 import MyCard from "./CustomCard"
+import Menu from "./Menu"
 import {useToasts} from "react-toast-notifications";
-import Button from "react-bootstrap/Button";
 import Square from "./Square"
 import axios from "axios"
+import MessagesForCard from "./MessagesForCard"
+import animateMethods from "./animateMethods"
 import {queryBackendHigherOrderFunctionSPF, queryBackendHigherOrderFunctionMaze} from "./QueryBackend"
 
 
@@ -20,7 +22,9 @@ const Board = (props) => {
                                                                         "changing the algorithm's chosen path",
                                                                         "As a note: The path found may not be the 'straightest' path as diagonal moves are valid," +
                                                                         "but if you count the squares it will be equal to a more intuitive path"])
-    const animationTrail = 10
+
+    const [barrier, setBarrier] = useState(false)
+    const [weightButton, setWeightButton] = useState(false)
     const HEIGHT = props.heightAndWidth
     const WIDTH = props.heightAndWidth
     const SIZE = props.heightAndWidth * props.heightAndWidth
@@ -30,284 +34,127 @@ const Board = (props) => {
     let [squares, setSquares] = useState(Array(SIZE).fill('grey'))
     let [weights, setWeights] = useState(Array(SIZE).fill(1))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
-    const [dropDownMenu, setDropDownMenu] = useState(Array(2).fill(false))
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
-    const [barrier, setBarrier] = useState(false)
+
     const {addToast} = useToasts()
-    const [weightButton, setWeightButton] = useState(false)
-
-/*******************************************/
-    /*
-    Methods for Card messages and responses
-     */
-    const backendResponse = (date1, data) =>
-    {
-        setLoading(false)
-        const date2 = new Date()
-        const time = Math.abs(date2-date1)
-        updateMessages(data, 'Backend'  )
-        updateMessages('Query round trip time: ' +  time + " milliseconds", 'Frontend')
-    }
-    const frontendInitialMessage = (message, caller) =>
-    {
-        if(caller === true)
-            if(checkForValidMarkers())
-                return
-        setLoading(true)
-        messageSeparator()
-        updateMessages(message, 'Frontend')
-        return null
-    }
-    const messageSeparator = () =>
-    {
-        updateMessages(" ", " *************************  ")
-    }
-
-    const updateMessages = (data, sender) =>
-    {
-        cardMessages.unshift(data)
-        backendOrFrontEnd.unshift(sender)
-        setCardMessages(cardMessages.slice())
-        setBackEndOrFrontEnd(backendOrFrontEnd.slice())
-
-    }
-    const clearCardMessages = () =>
-    {
-        setCardMessages([])
-        setBackEndOrFrontEnd([])
-    }
-    /*********************************************/
+    const messagesForCard = new MessagesForCard(cardMessages, backendOrFrontEnd, setCardMessages, setBackEndOrFrontEnd, setLoading)
+    const animateMethod = new animateMethods(squares, setSquares, addToast)
+   /********************************************/
     //Higher order function to make querying the backend more concise and easier
-    const queryBackendSPF = queryBackendHigherOrderFunctionSPF(testingUrl, SIZE, WIDTH, backendResponse, addToast)
-    const queryBackendMaze = queryBackendHigherOrderFunctionMaze(testingUrl, SIZE, WIDTH, HEIGHT, backendResponse, addToast, setBlockedNodes, setSquares)
+    const queryBackendSPF = queryBackendHigherOrderFunctionSPF(testingUrl, SIZE, WIDTH, messagesForCard.backendResponse, addToast)
+    const queryBackendMaze = queryBackendHigherOrderFunctionMaze(testingUrl, SIZE, WIDTH, HEIGHT, messagesForCard.backendResponse, addToast, setBlockedNodes, setSquares)
    /******************************************/
     /* Methods for SPF algorithms */
     let backendDijkstra = () =>
     {
-        const value = frontendInitialMessage('Sending data for Dijkstra', true)
-        if(value !== null) return value
-        queryBackendSPF('dijkstra', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("hey"))
+        if(checkForValidMarkers() === null) {
+            messagesForCard.frontendInitialMessage('Sending data for Dijkstra')
+            queryBackendSPF('dijkstra', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateMethod.animateWithReturnPath).then(r => console.log("hey"))
+        }
     }
     const backendDepthFirstSearch = () =>
     {
-        const value = frontendInitialMessage('Sending data for DFS', true)
-        if(value !== null) return value
-        queryBackendSPF('depthFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithoutReturnPath).then(r => console.log("ok"))
+        if(checkForValidMarkers() === null) {
+            messagesForCard.frontendInitialMessage('Sending data for DFS')
+            queryBackendSPF('depthFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateMethod.animateWithoutReturnPath).then(r => console.log("ok"))
+        }
     }
-
     const backendBreathFirstSearch = () => {
-        const value = frontendInitialMessage("Sending data for BFS", true)
-        if(value !== null) return value
-
-        queryBackendSPF('breathFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateWithReturnPath).then(r => console.log("ok"))
+        if(checkForValidMarkers() === null) {
+            messagesForCard.frontendInitialMessage("Sending data for BFS")
+            queryBackendSPF('breathFirstSearch', startMarkerIndex, endMarkerIndex, blockedNodes, weights, animateMethod.animateWithReturnPath).then(r => console.log("ok"))
+        }
     }
     // MAZES
     const generateBacktrack = () => {
-        frontendInitialMessage('Sending data for Recursive Backtracking Maze Generation', false)
+        messagesForCard.frontendInitialMessage('Sending data for Recursive Backtracking Maze Generation', false)
         queryBackendMaze('generateBacktracking', startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights).then(r => console.log())
     }
-
     const generatePrimsMaze = async () =>
     {
-        frontendInitialMessage("Sending data for Prim's Maze Generation", false)
+        messagesForCard.frontendInitialMessage("Sending data for Prim's Maze Generation", false)
         queryBackendMaze('generatePrimsMaze', startMarkerIndex, endMarkerIndex, squares, blockedNodes, weights).then(r => console.log())
     }
-    /********************************************************/
-    const animateTrail = (tickIndex, tickArr) =>
-    {
-        squares[tickArr[tickIndex]] = 'maroon'
-        if(tickIndex > animationTrail)
-        {
-            squares[tickArr[tickIndex-animationTrail]] = 'green'
-        }
-    }
-    const finishAnimationTrail = (current, tickArr, tickIndex) =>
-    {
-        squares[tickArr[tickIndex-current]] = 'green'
-        current--
-        setSquares(squares.slice())
-        return current
-    }
-    const returnToast = (tickArr) =>
-    {
-        if (tickArr[tickArr.length - 1] === false) {
-            return (
-                addToast("Path does not exist", {
-                    appearance: 'warning',
-                    autoDismiss: true,
-                }))
-        } else {
-            squares[tickArr[tickArr.length - 1]] = 'gold'
-            setSquares(squares.slice())
-            return (
-                addToast("Path does exist", {
-                    appearance: 'success',
-                    autoDismiss: true,
-                }))
-        }
-    }
-    const animateWithoutReturnPath = (arr) => {
-        let tickIndex = 1
-        let current = animationTrail
-        const timerID2 = setInterval(() => tick2(arr), 10)
-        resetBoardOnAlgorithmRun()
-        const tick2 = (tickArr) => {
-            if (tickIndex < tickArr.length - 1) {
-                //mutating the array directly :/
-                animateTrail(tickIndex, tickArr)
-                tickIndex++
-                setSquares(squares.slice())
-            } else {
-                if (current > 0)
-                    current = finishAnimationTrail(current, tickArr, tickIndex)
-                else
-                {
-                    clearInterval(timerID2)
-                    returnToast(tickArr)
-                }
-            }
-        }
-
-    }
-    let animateWithReturnPath = (arr) => {
-        const findPathArr = arr[0]
-        const shortestPathArr = arr[1]
-        const timerID2 = setInterval(() => tick2(findPathArr, shortestPathArr), 10)
-        let tickIndex = 0
-        resetBoardOnAlgorithmRun()
-        let finishedAnimatingFindPath = false
-        const tick2 = (findPathArr, shortestPathArr) =>
-        {
-            if(!finishedAnimatingFindPath)
-            {
-                if (tickIndex <= findPathArr.length) {
-                    for(let i = 0; i < 4; i++)
-                    {
-                        //mutating the array directly -- doesn't seem to update promptly otherwise
-                        if (tickIndex <= findPathArr.length && findPathArr[tickIndex] !== endMarkerIndex && findPathArr[tickIndex] !== startMarkerIndex)
-                        {
-                            squares[findPathArr[tickIndex]] = 'green'
-                        }
-                        tickIndex++
-                    }
-                }
-                else
-                {
-                    finishedAnimatingFindPath = true
-                    squares[endMarkerIndex] = 'gold'
-                    tickIndex = 0
-                }
-                setSquares(squares.slice())
-            }
-            else
-            {
-                if(tickIndex < shortestPathArr.length - 1)
-                {
-                    squares[shortestPathArr[tickIndex]] = 'gold'
-                    setSquares(squares.slice())
-                    tickIndex++
-                }
-                else{
-                    squares[shortestPathArr[shortestPathArr.length - 1]] = 'gold'
-                    setSquares(squares.slice())
-                    clearInterval(timerID2)
-                }
-            }
-        }
-    }
-
     const setWeight = (count) => {
         weights[count] = weights[count]+1
         setWeights(weights.slice())
     }
 
     const checkForValidMarkers = () => {
-        if (startMarkerIndex < 0 || endMarkerIndex < 0) {
+        if((startMarkerIndex < 0 || endMarkerIndex < 0))
+        {
             return (
                 addToast("Please select a starting and ending location first", {
                     appearance: 'warning',
                     autoDismiss: true,
                 }))
-        } else return null
+        }
+        return null
+    }
+    const setStartAndEndLocations = (markerMethod, index, color, deselected) =>
+    {
+        const temp = squares.slice()
+        if(deselected) {
+            resetBoardOnDestinationChange(temp)
+            markerMethod(-1)
+        }
+        else {
+            markerMethod(index)
+        }
+        temp[index] = color
+        setSquares(temp)
     }
 
-
+    const setNodeToBlocked = (i) =>
+    {
+        blockedNodes[i] = true
+        setBlockedNodes(blockedNodes.slice())
+        squares[i] = 'black'
+        setSquares(squares.slice())
+    }
     let SetMarker = (i) => {
         let toastMessage = ""
-        let startStateMarker = startMarkerIndex;
-        let endStateMarker = endMarkerIndex;
         if(blockedNodes[i]) //is already a blocked node.  Nothing to do with those
-        {
             return
-        }
         if (barrier) { //manually setting barrier
-            blockedNodes[i] = true
-            setBlockedNodes(blockedNodes.slice())
-            squares[i] = 'black'
-            setSquares(squares.slice())
+            setNodeToBlocked(i)
             return
-        } else if (startStateMarker === i) {
-            squares[i] = 'grey'
-            startStateMarker = -1
-            toastMessage = "Deselected Start Location"
-            resetBoardOnDestinationChange()
-        } else if (startStateMarker < 0 && endStateMarker === i) {
-            endStateMarker = -1
-            squares[i] = 'grey'
-            resetBoardOnDestinationChange()
-            toastMessage = "Deselected End Location"
-        } else if (startStateMarker < 0) {
-            startStateMarker = i
-            squares[i] = 'orange'
+        } else if (startMarkerIndex === i) {
+            setStartAndEndLocations(setStartMarkerIndex, i, 'grey', true)
+            toastMessage = 'Deselected Start Location'
+        } else if (startMarkerIndex < 0 && endMarkerIndex === i) {
+            setStartAndEndLocations(setEndMarkerIndex, i, 'grey', true)
+            toastMessage = 'Deselected End Location'
+        } else if (startMarkerIndex < 0) {
+            setStartAndEndLocations(setStartMarkerIndex, i, 'orange', false)
             toastMessage = "Start Location Selected"
-        } else if (endStateMarker === i) {
-            squares[i] = 'grey'
-            endStateMarker = -1
-            resetBoardOnDestinationChange()
+        } else if (endMarkerIndex === i) {
+            setStartAndEndLocations(setEndMarkerIndex, i, 'grey', true)
             toastMessage = "Deselected End Location"
-        } else if (endStateMarker < 0) {
-            endStateMarker = i
-            squares[i] = 'cornflowerblue'
-            toastMessage = "Selected End Location"
+        } else if (endMarkerIndex < 0) {
+            setStartAndEndLocations(setEndMarkerIndex, i, 'cornflowerblue', false)
+            toastMessage = 'Selected End Location'
         } else {
             return
         }
-        setStartMarkerIndex(startStateMarker)
-        setEndMarkerIndex(endStateMarker)
-        squares[startStateMarker] = 'orange'
-        squares[endStateMarker] = 'cornflowerblue'
-        setSquares(squares.slice())
-        return (
-            addToast(toastMessage, {
-                appearance: 'info',
-                autoDismiss: true,
-            }))
+        return (addToast(toastMessage, {appearance: 'info', autoDismiss: true,}))
     }
-
     const clearSquares = () => {
         //squares not changing without setting squares explicitly
         for(let i = 0; i < squares.length; i++) {
-            squares = Array(SIZE).fill(null)
-            setSquares(Array(SIZE).fill(null))
+            squares = Array(SIZE).fill('grey')
+            setSquares(Array(SIZE).fill('grey'))
         }
     }
-    const resetBoardOnDestinationChange = () =>{
+    const resetBoardOnDestinationChange = (temp) =>{
         for(let i = 0; i < squares.length; i++) {
-            if (squares[i] === 'green' || squares[i] === 'gold') {
-                squares[i] = 'grey'
+            if (temp[i] !== 'black' && i !== startMarkerIndex && i !== endMarkerIndex) {
+                temp[i] = 'grey'
             }
         }
-        setSquares(squares.slice())
-    }
-    const resetBoardOnAlgorithmRun = () =>{
-        for(let i = 0; i < squares.length; i++) {
-            if (squares[i] === 'green' || squares[i] === 'gold') {
-                squares[i] = 'grey'
-            }
-        }
-        squares[startMarkerIndex] = 'startMarker'
-        squares[endMarkerIndex] = 'endMarker'
-        setSquares(squares.slice())
+        temp[startMarkerIndex] = 'orange'
+        temp[endMarkerIndex] = 'cornflowerblue'
+        return temp
     }
     const clearBarrier = () => {
         setBlockedNodes(Array(SIZE).fill(false))
@@ -325,60 +172,40 @@ const Board = (props) => {
         clearMarkers()
         clearWeights()
     }
-    const createBarrier = () => {
-        setBarrier(!barrier)
-        if(weightButton)
-        {
-            setWeightButtonFunction()
-        }
-        if (barrier)
-            document.getElementById("barrier").innerText = "Draw Barrier"
-        else
-            document.getElementById("barrier").innerText = "Disable Barrier"
-    }
 
-    const setWeightButtonFunction = () =>
-    {
-        setWeightButton(!weightButton)
-        if(barrier)
-        {
-            createBarrier()
-        }
-        if(weightButton)
-            document.getElementById("addWeights").innerText = "Set Weights"
-        else
-            document.getElementById("addWeights").innerText = "Toggle Weights Off"
-
-    }
     const randomizeWeights = async () =>
     {
         let date1 = new Date()
         setLoading(true)
-        messageSeparator()
-        updateMessages('Sending data for random weight generation', 'Frontend')
+        messagesForCard.messageSeparator()
+        messagesForCard.updateMessages('Sending data for random weight generation', 'Frontend')
         await axios.post(testingUrl + 'weightGeneration', {SIZE})
             .then(res => {
                 setLoading(false)
-                backendResponse(date1, res.data[0])
+                messagesForCard.backendResponse(date1, res.data[0])
                 setWeights(res.data[1])
             })
     }
-
-    const generatePrimsTree = async () =>
-    {
-         frontendInitialMessage("Sending data for Prims Minimum Spanning Tree", false)
+    /**** WIP *********/
+    const generatePrimsTree = async () => {
+       // if (checkForValidMarkers(false) !== null)
+        //    return
+         messagesForCard.frontendInitialMessage("Sending data for Prims Minimum Spanning Tree", setLoading)
          setEndMarkerIndex(-1)
          setStartMarkerIndex(-1)
          let date1 = new Date()
          setLoading(true)
-         messageSeparator()
-         updateMessages('Sending data for maze generation', 'Frontend')
+         messagesForCard.messageSeparator()
+         clearGraph()
+         messagesForCard.updateMessages('Sending data for maze generation', 'Frontend')
          const start = Math.floor(Math.random() * Math.floor(SIZE))
         console.log(start)
          await axios.post(testingUrl + 'primsTree', {start, SIZE, WIDTH, blockedNodes})
              .then(res => {
+                 setStartMarkerIndex(start)
+                 setSquares(squares.slice())
                  setLoading(false)
-                 backendResponse(date1, res.data[0])
+                 messagesForCard.backendResponse(date1, res.data[0])
                  const nodeArr = res.data[1][0]
                  const edgeArr = res.data[1][1]
                  const initialWeightList = res.data[1][2]
@@ -429,6 +256,8 @@ const Board = (props) => {
                          if(directionOfEdges[i][1] === "F")
                          {
                              weights[i] = ""
+                             squares[i] = 'black'
+                             blockedNodes[i] = true
                          }
                          else {
                              weights[i] = directionOfEdges[i][1]
@@ -440,16 +269,14 @@ const Board = (props) => {
                          weights[i] = finalWeights[i]
                      }
                  }
+                 squares[start] = 'orange'
                  setWeights(weights.slice())
                  setSquares(squares.slice())
-                 //console.log(visitedNodeList)
-
+                 setBlockedNodes(blockedNodes.slice())
              })
              .catch(err => {console.error(err)})
 
     }
-
-
     /**************************************/
     /* methods to control menus */
 
@@ -462,15 +289,6 @@ const Board = (props) => {
         else
             SetMarker(i)
     }
-    const toggleOpen = (i) =>
-    {
-        const temp = [false, false]
-        temp[i] = !dropDownMenu[i]
-        setDropDownMenu(temp)
-    }
-    const menuClass1 = `dropdown-menu ${ dropDownMenu[0]? " show": ""}`
-    const menuClass2 = `dropdown-menu ${ dropDownMenu[1]? " show": ""}`
-
     /***************************************/
     /* everything below is to render the board*/
     let parent = []
@@ -483,69 +301,24 @@ const Board = (props) => {
         }
         parent.push(<div key={i} className={"board-row"}>{children}</div>)
     }
+    const menuDictionaryMethods = {backendDepthFirstSearch: backendDepthFirstSearch, backendBreathFirstSearch: backendBreathFirstSearch, backendDijkstra: backendDijkstra,
+        generatePrimsMaze: generatePrimsMaze, generateBacktrack: generateBacktrack,
+        clearGraph: clearGraph, randomizeWeights: randomizeWeights, clearWeights: clearWeights,
+        generatePrimsTree: generatePrimsTree, barrier: barrier, setBarrier: setBarrier, weightButton: weightButton, setWeightButton: setWeightButton}
 
     return (
         <div id={"box"}>
             <div id={"leftBox"}>
-                    <div id = "buttons1" className = "btn-group-vertical" role={"group"}>
-                        <div className="btn-group" role="group">
-                            <button id="btnGroupDrop" type="button"  onClick = {toggleOpen.bind(this, 0)} className="btn btn-primary dropdown-toggle"
-                                data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
-                                Shortest Path Algorithms
-                            </button>
-                            <div className={menuClass1} aria-labelledby="btnGroupDrop1">
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDepthFirstSearch.bind(this) }>
-                                    Depth First Search
-                                    <p> (Does path Exist)</p>
-                                </a>
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendBreathFirstSearch.bind(this) }>
-                                    Breath-First Search
-                                    <p>(Shortest Path)</p>
-                                </a>
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton" onClick = { backendDijkstra.bind(this) }>
-                                    Dijkstra's SPF
-                                </a>
-                            </div>
-                        </div>
-                        <div className="btn-group" role="group">
-                            <button id="btnGroupDrop" type="button"  onClick = {toggleOpen.bind(this, 1)} className="btn btn-primary dropdown-toggle"
-                                    data-toggle="dropdown-menu" aria-haspopup="true" aria-expanded="false">
-                                Maze Generation Algorithms
-                            </button>
-                            <div className={menuClass2} aria-labelledby="btnGroupDrop11">
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generatePrimsMaze.bind(this) }>
-                                    Prim's Maze
-                                </a>
-                                <a id={"menuButton"} className = "btn btn-primary-controlButton1" onClick = { generateBacktrack.bind(this) }>
-                                    Recursive Backtracking
-                                </a>
-
-                            </div>
-                        </div>
-                    <Button className = "btn btn-lg btn-primary-controlButton" onClick = {clearGraph.bind(this)}>Clear Graph</Button>
-                    <Button className = "btn btn-lg btn-primary-controlButton"  id = "barrier" onClick = { createBarrier.bind(this)}>Draw Barrier</Button>
-                    <Button className = "btn btn-lg btn-primary-controlButton" id ="addWeights" onClick = { setWeightButtonFunction.bind(this) }>Set Weights</Button>
-                        <Button className = "btn btn-lg btn-primary-controlButton" id ="randomizeWeights" onClick = { randomizeWeights.bind(this)}>Randomize Weights</Button>
-                    <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { clearWeights.bind(this)}>Remove Weights</Button>
-                           <Button className = "btn btn-lg btn-primary-controlButton" id = "randomizeWeights" onClick = { generatePrimsTree.bind(this)}>Create Randomized Minimum Spanning Tree (not finished)</Button>
-                    </div>
+                <Menu dictionary = {menuDictionaryMethods}/>
             </div>
             <div id={"centerBox"}>
                 {parent}
                 <div id={"rightBox"}>
-                    <MyCard loading = {loading} clearMessages = {clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
-
+                    <MyCard loading = {loading} clearMessages = {messagesForCard.clearCardMessages.bind(this)} messages = {cardMessages} header = {backendOrFrontEnd} />
                 </div>
             </div>
-
-
         </div>
     );
 }
 
 export default Board
-
-
-/*
-
- */
