@@ -231,7 +231,7 @@ const Board = (props) => {
                  //FOR INITIAL SETUP DONT ERASE
                   for(let i = 0; i < nodeArr.length; i++)
                   {
-                      squares[nodeArr[i]] = 'white'
+                      squares[nodeArr[i]] = 'grey'
                       weights[nodeArr[i]] = '\u221E'
                   }
 
@@ -261,7 +261,7 @@ const Board = (props) => {
                          }
                          else {
                              weights[i] = directionOfEdges[i][1]
-                             squares[i] = 'white'
+                             squares[i] = 'grey'
                          }
                      }
                      else
