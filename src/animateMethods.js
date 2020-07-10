@@ -3,7 +3,7 @@ class animateMethods{
     constructor(squares, setSquares, addToast)
     {
         this.animationTrail = 10
-        this.squares = squares
+        this.squares = squares.slice()
         this.setSquares = setSquares
         this.addToast = addToast
     }

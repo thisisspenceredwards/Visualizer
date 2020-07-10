@@ -29,10 +29,10 @@ const Board = (props) => {
     const WIDTH = props.heightAndWidth
     const SIZE = props.heightAndWidth * props.heightAndWidth
     const [loading, setLoading] = useState(false)
-    let [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
+    const [backendOrFrontEnd, setBackEndOrFrontEnd] = useState([])
     const [blockedNodes, setBlockedNodes] = useState(Array(SIZE).fill(false))
-    let [squares, setSquares] = useState(Array(SIZE).fill('grey'))
-    let [weights, setWeights] = useState(Array(SIZE).fill(1))
+    const [squares, setSquares] = useState(Array(SIZE).fill('grey'))
+    const [weights, setWeights] = useState(Array(SIZE).fill(1))
     const [startMarkerIndex, setStartMarkerIndex] = useState(-1)
     const [endMarkerIndex, setEndMarkerIndex] = useState(-1)
 
@@ -107,10 +107,12 @@ const Board = (props) => {
 
     const setNodeToBlocked = (i) =>
     {
-        blockedNodes[i] = true
-        setBlockedNodes(blockedNodes.slice())
-        squares[i] = 'black'
-        setSquares(squares.slice())
+        const tempBlockedNodes = blockedNodes.slice()
+        const tempSquares = squares.slice()
+        tempBlockedNodes[i] = true
+        setBlockedNodes(tempBlockedNodes)
+        tempSquares[i] = 'black'
+        setSquares(tempSquares.slice())
     }
     let SetMarker = (i) => {
         let toastMessage = ""
@@ -140,11 +142,7 @@ const Board = (props) => {
         return (addToast(toastMessage, {appearance: 'info', autoDismiss: true,}))
     }
     const clearSquares = () => {
-        //squares not changing without setting squares explicitly
-        for(let i = 0; i < squares.length; i++) {
-            squares = Array(SIZE).fill('grey')
             setSquares(Array(SIZE).fill('grey'))
-        }
     }
     const resetBoardOnDestinationChange = (temp) =>{
         for(let i = 0; i < squares.length; i++) {
@@ -202,8 +200,8 @@ const Board = (props) => {
         console.log(start)
          await axios.post(testingUrl + 'primsTree', {start, SIZE, WIDTH, blockedNodes})
              .then(res => {
+
                  setStartMarkerIndex(start)
-                 setSquares(squares.slice())
                  setLoading(false)
                  messagesForCard.backendResponse(date1, res.data[0])
                  const nodeArr = res.data[1][0]
@@ -215,6 +213,8 @@ const Board = (props) => {
                  const orderOfTraversal = res.data[1][6]
                  const directionOfEdges = res.data[1][7]
                  let tempBlockedNodes = Array(SIZE).fill(false)
+                 const tempSquares = squares.slice()
+                 const tempWeights = weights.slice()
 
                  ///WORK ON tRYING TO ANIMATE ORDER OF TRAVERSAL
 
@@ -231,7 +231,7 @@ const Board = (props) => {
                  //FOR INITIAL SETUP DONT ERASE
                   for(let i = 0; i < nodeArr.length; i++)
                   {
-                      squares[nodeArr[i]] = 'grey'
+                      tempSquares[nodeArr[i]] = 'grey'
                       weights[nodeArr[i]] = '\u221E'
                   }
 
@@ -255,24 +255,24 @@ const Board = (props) => {
                      {
                          if(directionOfEdges[i][1] === "F")
                          {
-                             weights[i] = ""
-                             squares[i] = 'black'
-                             blockedNodes[i] = true
+                             tempWeights[i] = ""
+                             tempSquares[i] = 'black'
+                             tempBlockedNodes[i] = true
                          }
                          else {
-                             weights[i] = directionOfEdges[i][1]
-                             squares[i] = 'grey'
+                             tempWeights[i] = directionOfEdges[i][1]
+                             tempSquares[i] = 'grey'
                          }
                      }
                      else
                      {
-                         weights[i] = finalWeights[i]
+                         tempWeights[i] = finalWeights[i]
                      }
                  }
-                 squares[start] = 'orange'
-                 setWeights(weights.slice())
-                 setSquares(squares.slice())
-                 setBlockedNodes(blockedNodes.slice())
+                 tempSquares[start] = 'orange'
+                 setWeights(tempWeights.slice())
+                 setSquares(tempSquares.slice())
+                 setBlockedNodes(tempBlockedNodes.slice())
              })
              .catch(err => {console.error(err)})
 
