@@ -114,7 +114,7 @@ const Board = (props) => {
         tempSquares[i] = 'black'
         setSquares(tempSquares.slice())
     }
-    let SetMarker = (i) => {
+    let setMarker = (i) => {
         let toastMessage = ""
         if(blockedNodes[i]) //is already a blocked node.  Nothing to do with those
             return
@@ -287,7 +287,7 @@ const Board = (props) => {
         if(weightButton)
             setWeight(i)
         else
-            SetMarker(i)
+            setMarker(i)
     }
     /***************************************/
     /* everything below is to render the board*/
